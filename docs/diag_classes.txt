@@ -1,0 +1,309 @@
+classDiagram
+
+    %% ============ UTILISATEURS & RÔLES ============
+    class Utilisateur {
+        <<abstract>>
+        -UUID id
+        -UUID etablissementId
+        -String email, motDePasse
+        -String nom, prenom, telephone
+        -Role role
+        -Boolean actif
+        -DateTime createdAt
+        +seConnecter()
+        +modifierProfil()
+    }
+
+    class Directeur {
+        +configurerEtablissement()
+        +gererDroitsAcces()
+        +validerEvenement()
+    }
+
+    class Secretaire {
+        +publierAnnonce()
+        +gererDossierEleve()
+        +gererReinscription()
+    }
+
+    class Comptable {
+        +validerPaiement()
+        +genererFacture()
+        +envoyerFactureParEmail()
+    }
+
+    class Professeur {
+        -String specialite, matricule
+        -List~Pointage~ historiquePointage
+        +publierCours()
+        +saisirNotes()
+        +pointer()
+    }
+
+    class Eleve {
+        -String matricule
+        -Date dateNaissance
+        -String lieuNaissance
+        -Sexe sexe
+        -StatutInscription statut
+        +consulterCours()
+        +consulterBulletins()
+        +demanderReinscription()
+    }
+
+    class Parent {
+        -String profession
+        +consulterResultats()
+        +effectuerPaiement()
+    }
+
+    class Pointage {
+        -DateTime date
+        -Time heureArrivee, heureDepart
+        -StatutPointage statut
+    }
+
+    Utilisateur <|-- Directeur
+    Utilisateur <|-- Secretaire
+    Utilisateur <|-- Comptable
+    Utilisateur <|-- Professeur
+    Utilisateur <|-- Eleve
+    Utilisateur <|-- Parent
+    Professeur "1" --> "*" Pointage : enregistre
+    Eleve "*" --> "1" Parent : tuteur
+
+    %% ============ STRUCTURE SCOLAIRE ============
+    class Etablissement {
+        -UUID id
+        -String nom, adresse, telephone, email, logo
+        -TypeEtablissement type
+        -JSON configNotation, tarifs
+        -Boolean actif
+        +configurerNiveaux()
+        +configurerReglesNotation()
+    }
+
+    class Niveau {
+        -UUID id
+        -String nom, cycle
+        -Integer ordre
+    }
+
+    class Classe {
+        -UUID id
+        -String nom, anneeScolaire
+        -Integer effectif
+    }
+
+    class Matiere {
+        -UUID id
+        -String nom, code
+        -Float coefficient
+    }
+
+    class EmploiDuTemps {
+        -UUID id
+        -JourSemaine jour
+        -Time heureDebut, heureFin
+        -String salle
+    }
+
+    Etablissement "1" --> "*" Utilisateur : emploie
+    Etablissement "1" --> "*" Niveau : contient
+    Etablissement "1" --> "*" Matiere : propose
+    Etablissement "1" --> "*" EmploiDuTemps : planifie
+    Niveau "1" --> "*" Classe : regroupe
+    Classe "1" --> "*" Eleve : accueille
+    Classe "1" --> "*" EmploiDuTemps : suit
+    Professeur "*" --> "*" Matiere : enseigne
+
+    %% ============ PÉDAGOGIE & ÉVALUATIONS ============
+    class Cours {
+        -UUID id
+        -String titre
+        -Text contenu
+        -TypeCours type
+        -DateTime datePublication
+        -List~Media~ supports
+    }
+
+    class Media {
+        -String nomFichier, url
+        -TypeMedia type
+        -Long taille
+    }
+
+    class Evaluation {
+        -UUID id
+        -String titre
+        -TypeEvaluation type
+        -Float coefficient
+        -Periode periode
+        -Integer numeroPeriode
+        -DateTime dateEvaluation
+    }
+
+    class Note {
+        -UUID id
+        -Float valeur
+        -String appreciation
+        -DateTime dateSaisie
+        -UUID saisiePar
+    }
+
+    class Bulletin {
+        -UUID id
+        -Periode periode
+        -Integer numeroPeriode
+        -String anneeScolaire
+        -Float moyenneGenerale
+        -Integer rang
+        -String mention
+        -String fichierPdf
+        +genererPDF()
+    }
+
+    Professeur "1" --> "*" Cours : publie
+    Professeur "1" --> "*" Evaluation : cree
+    Professeur "1" --> "*" Note : saisit
+    Classe "1" --> "*" Cours : recoit
+    Classe "1" --> "*" Evaluation : subit
+    Matiere "1" --> "*" Evaluation : concerne
+    Matiere "1" --> "*" Cours : porte sur
+    Matiere "1" --> "*" EmploiDuTemps : programme
+    Cours "1" --> "*" Media : contient
+    Evaluation "1" --> "*" Note : genere
+    Eleve "1" --> "*" Note : recoit
+    Eleve "1" --> "*" Bulletin : possede
+    Bulletin "1" --> "*" Note : agrege
+
+    %% ============ PAIEMENT & FINANCES ============
+    class Transaction {
+        -UUID id
+        -TypePaiement type
+        -Decimal montant
+        -ModePaiement mode
+        -String referenceTransaction
+        -StatutPaiement statut
+        -DateTime datePaiement, dateValidation
+        -UUID validePar
+        +valider()
+        +genererFacturePDF()
+        +envoyerParEmail()
+    }
+
+    class Reinscription {
+        -UUID id
+        -String anneeScolaire
+        -DateTime dateDemande
+        -StatutReinscription statut
+        +confirmer()
+        +refuser()
+    }
+
+    Eleve "1" --> "*" Transaction : effectue
+    Eleve "1" --> "*" Reinscription : demande
+    Transaction "*" --> "1" Comptable : valide par
+    Reinscription "1" --> "0..1" Transaction : inclut
+    Reinscription "*" --> "1" Comptable : confirme par
+
+    %% ============ COMMUNICATION ============
+    class Annonce {
+        -UUID id
+        -TypeAnnonce type
+        -String titre
+        -Text contenu
+        -DateTime datePublication
+        -Boolean visiblePublic
+    }
+
+    class Fourniture {
+        -UUID id
+        -String nom
+        -Integer quantite
+        -Text description
+    }
+
+    class Notification {
+        -UUID id
+        -TypeNotification type
+        -String titre
+        -Text message
+        -DateTime dateEnvoi
+        -Boolean lu
+        +marquerCommeLu()
+    }
+
+    class GroupeChat {
+        -UUID id
+        -String nom
+        -TypeGroupe type
+        -UUID referenceId
+    }
+
+    class Message {
+        -UUID id
+        -Text contenu
+        -DateTime dateEnvoi
+        -String fichierJoint
+    }
+
+    Etablissement "1" --> "*" Annonce : publie
+    Annonce "*" --> "1" Secretaire : publiee par
+    Niveau "1" --> "*" Fourniture : concerne
+    Utilisateur "1" --> "*" Notification : recoit
+    Utilisateur "*" --> "*" GroupeChat : rejoint
+    GroupeChat "1" --> "*" Message : contient
+    Message "*" --> "1" Utilisateur : envoye par
+
+    %% ============ CLUBS & ÉVÉNEMENTS ============
+    class Club {
+        -UUID id
+        -String nom
+        -Text description
+        -UUID responsableId
+        -List~MembreClub~ membres
+        -List~Activite~ activites
+    }
+
+    class MembreClub {
+        -UUID eleveId
+        -RoleMembre role
+        -DateTime dateAdhesion
+    }
+
+    class Activite {
+        -UUID id
+        -String titre
+        -Text description
+        -DateTime dateActivite
+        -String lieu
+    }
+
+    class Evenement {
+        -UUID id
+        -String titre
+        -Text description
+        -TypeEvenement type
+        -DateTime dateDebut, dateFin
+        -String lieu
+        -StatutEvenement statut
+        -Decimal budgetEstime
+        -List~Organisateur~ organisateurs
+        +valider()
+        +annuler()
+    }
+
+    class Organisateur {
+        -UUID utilisateurId
+        -String role
+    }
+
+    Etablissement "1" --> "*" Club : heberge
+    Club "1" --> "*" MembreClub : compte
+    MembreClub "*" --> "1" Eleve : concerne
+    Club "1" --> "*" Activite : organise
+    Club "1" --> "*" Evenement : heberge
+    Evenement "*" --> "1" Directeur : valide par
+    Evenement "1" --> "*" Organisateur : coordonne
+    Organisateur "*" --> "1" Utilisateur : implique
