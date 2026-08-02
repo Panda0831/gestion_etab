@@ -1,0 +1,29 @@
+| #  | Table                         | Package       | Rôle                                             |
+| -- | ----------------------------- | ------------- | ------------------------------------------------ |
+| 1  | `etablissement`               | Utilisateurs  | Configuration de l'ecole/lycee/univ              |
+| 2  | `utilisateur`                 | Utilisateurs  | Tous les comptes (6 rôles)                       |
+| 3  | `eleve`                       | Utilisateurs  | Infos specifiques eleve + lien parent/classe     |
+| 4  | `parent`                      | Utilisateurs  | Infos specifiques parent                         |
+| 5  | `pointage`                    | Utilisateurs  | Presence des professeurs                         |
+| 6  | `niveau`                      | Structure     | 6eme, 5eme, Terminale, L1, L2...                 |
+| 7  | `classe`                      | Structure     | 6eme A, 6eme B...                                |
+| 8  | `matiere`                     | Structure     | Maths, Français, Physique...                     |
+| 9  | `professeur_matiere`          | Structure     | Qui enseigne quoi (many-to-many)                 |
+| 10 | `emploi_du_temps`             | Structure     | Creneaux horaires par classe                     |
+| 11 | `fourniture`                  | Structure     | Liste des fournitures par niveau                 |
+| 12 | `cours`                       | Pedagogie     | Cours publies par les profs                      |
+| 13 | `cours_media`                 | Pedagogie     | Fichiers joints (PDF, video, audio)              |
+| 14 | `evaluation`                  | Pedagogie     | Devoirs, examens, rattrapages, TP                |
+| 15 | `note`                        | Pedagogie     | Note de chaque eleve par evaluation              |
+| 16 | `bulletin`                    | Pedagogie     | Bulletin trimestriel genere                      |
+| 17 | `bulletin_detail`             | Pedagogie     | Detail des notes dans le bulletin (audit)        |
+| 18 | `transaction_financiere`      | Paiement      | Paiement + facture + reinscription fusionnes     |
+| 19 | `parametre_notation`          | Paiement      | Regles de calcul configurables par etablissement |
+| 20 | `communication`               | Communication | Annonces publiques + notifications privees       |
+| 21 | `discussion`                  | Communication | Groupe de chat (classe, club, evenement)         |
+| 22 | `discussion_membre`           | Communication | Membres d'une discussion (many-to-many)          |
+| 23 | `message`                     | Communication | Messages dans les discussions                    |
+| 24 | `club_evenement`              | Clubs         | Club ou evenement (discrimine par type)          |
+| 25 | `club_evenement_membre`       | Clubs         | Adhesion eleve au club (many-to-many)            |
+| 26 | `club_evenement_organisateur` | Clubs         | Organisateurs d'un evenement (many-to-many)      |
+| 27 | `audit_log`                   | Transverse    | Traçabilite de toutes les operations sensibles   |
