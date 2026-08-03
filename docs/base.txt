@@ -21,7 +21,7 @@
 | 19 | `parametre_notation`          | Paiement      | Regles de calcul configurables par etablissement |
 | 20 | `communication`               | Communication | Annonces publiques + notifications privees       |
 | 21 | `discussion`                  | Communication | Groupe de chat (classe, club, evenement)         |
-| 22 | `discussion_membre`           | Communication | Membres d'une discussion (many-to-many)          |
+| 22 | `discussion_membre`           | Communication | Membres d'uane discussion (many-to-many)          |
 | 23 | `message`                     | Communication | Messages dans les discussions                    |
 | 24 | `club_evenement`              | Clubs         | Club ou evenement (discrimine par type)          |
 | 25 | `club_evenement_membre`       | Clubs         | Adhesion eleve au club (many-to-many)            |
