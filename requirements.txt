@@ -1,0 +1,155 @@
+# ==============================================================================
+# REQUIREMENTS & STACK TECHNIQUE — SYSTÈME DE GESTION SCOLAIRE
+# Fichier généré depuis : STACK_PARFAIT_CORRIGE_Gestion_Scolaire.docx
+# ==============================================================================
+
+# ------------------------------------------------------------------------------
+# 1. ENVIRONNEMENT SYSTÈME & RUNTIME (INFRASTRUCTURE & CONTAINERS)
+# ------------------------------------------------------------------------------
+node >= 18.18.0             # Runtime JS (LTS 20.x recommandé)
+npm >= 9.0.0                # Gestionnaire de paquets Node.js
+docker >= 24.0.0            # Conteneurisation des services
+docker-compose >= 2.20.0    # Orchestration multi-conteneurs
+postgresql >= 15.0          # Base de données relationnelle (ACID + RLS)
+redis >= 7.0                # Cache, Pub/Sub, Redis Adapter & Bull Queue
+minio >= 2023.01.0          # Stockage objet S3-compatible (Bulletins, Médias)
+nginx >= 1.24.0             # Reverse proxy, SSL Let's Encrypt, compression gzip
+
+# ------------------------------------------------------------------------------
+# 2. BACKEND — NestJS + TypeScript + Prisma
+# ------------------------------------------------------------------------------
+# Core Framework NestJS
+@nestjs/core >= 10.0.0
+@nestjs/common >= 10.0.0
+@nestjs/platform-express >= 10.0.0
+@nestjs/config >= 3.0.0
+reflect-metadata >= 0.1.13
+rxjs >= 7.8.0
+
+# ORM & Database Access
+prisma >= 5.0.0
+@prisma/client >= 5.0.0
+
+# Authentification, Sécurité & Cryptographie
+@nestjs/jwt >= 10.0.0
+@nestjs/passport >= 10.0.0
+passport >= 0.6.0
+passport-jwt >= 4.0.0
+argon2 >= 0.31.0            # Hachage sécurisé des mots de passe (OWASP 2024+)
+helmet >= 7.0.0             # En-têtes HTTP de sécurité (XSS, clickjacking)
+@nestjs/throttler >= 5.0.0  # Anti brute-force et rate limiting API
+
+# Communication Temps Réel (WebSockets)
+@nestjs/websockets >= 10.0.0
+@nestjs/platform-socket.io >= 10.0.0
+socket.io >= 4.7.0
+@socket.io/redis-adapter >= 8.2.0  # Synchronisation multi-instances NestJS
+
+# Files d'attente (Queues Asynchrones & Background Jobs)
+@nestjs/bull >= 10.0.0
+bull >= 4.11.0              # Traitement webhooks paiement & génération PDF async
+ioredis >= 5.3.0            # Client Redis haute performance
+
+# Validation DTO & Transformation
+class-validator >= 0.14.0   # Validation des données entrantes (@IsEmail, @Min, @Max)
+class-transformer >= 0.5.1  # Casting et transformation des objets DTO
+
+# Journalisation (Logging High-Performance)
+nestjs-pino >= 4.0.0        # Integration Pino pour NestJS
+pino >= 8.15.0              # Logging 5x plus rapide que Winston (JSON structuré)
+pino-http >= 8.5.0
+
+# Services de Stockage Objet, Mail & Paiements
+@aws-sdk/client-s3 >= 3.400.0 # Client S3 pour MinIO (bulletins, cours, logos)
+nodemailer >= 6.9.0         # Envoi des emails d'information et factures
+@nestjs-modules/mailer >= 1.9.0
+pdfkit >= 0.13.0            # Génération dynamique des bulletins PDF & factures
+axios >= 1.5.0              # Client HTTP pour APIs Mobile Money (Mvola / Orange Money)
+stripe >= 13.0.0            # Intégration Stripe (optionnel cartes bancaires)
+dotenv >= 16.3.0            # Chargement des variables d'environnement (.env)
+
+# Outillage & Tests Backend (devDependencies)
+@nestjs/cli >= 10.0.0
+@nestjs/schematics >= 10.0.0
+@nestjs/testing >= 10.0.0
+typescript >= 5.1.0
+ts-node >= 10.9.0
+tsconfig-paths >= 4.2.0
+@types/node >= 20.0.0
+@types/express >= 4.17.0
+@types/passport-jwt >= 3.0.0
+@types/nodemailer >= 6.4.0
+jest >= 29.5.0              # Framework de tests unitaires et d'intégration
+ts-jest >= 29.1.0
+supertest >= 6.3.3          # Tests d'intégration API HTTP
+eslint >= 8.42.0
+prettier >= 3.0.0
+
+# ------------------------------------------------------------------------------
+# 3. FRONTEND WEB — Next.js 14+ (App Router) + React + TailwindCSS
+# ------------------------------------------------------------------------------
+# Core Next.js & React
+next >= 14.0.0
+react >= 18.2.0
+react-dom >= 18.2.0
+typescript >= 5.1.0
+
+# Style, UI & Design System (shadcn/ui)
+tailwindcss >= 3.3.0
+postcss >= 8.4.0
+autoprefixer >= 10.4.0
+clsx >= 2.0.0
+tailwind-merge >= 1.14.0
+lucide-react >= 0.270.0      # Icônes modernes
+@radix-ui/react-dialog >= 1.0.0
+@radix-ui/react-dropdown-menu >= 2.0.0
+@radix-ui/react-select >= 1.2.0
+@radix-ui/react-slot >= 1.0.0
+@radix-ui/react-toast >= 1.1.0
+
+# Gestion d'État & Data Fetching Client
+@tanstack/react-query >= 5.0.0  # Cache serveur & stale-while-revalidate
+zustand >= 4.4.0                # État global léger (session, notifications)
+
+# Formulaires & Validations Client/Serveur
+react-hook-form >= 7.46.0
+@hookform/resolvers >= 3.3.0
+zod >= 3.22.0               # Validation de schéma partagée web/mobile/backend
+
+# Utilities Web
+axios >= 1.5.0
+
+# Outillage Frontend (devDependencies)
+@types/react >= 18.2.0
+@types/react-dom >= 18.2.0
+eslint >= 8.42.0
+eslint-config-next >= 14.0.0
+prettier >= 3.0.0
+
+# ------------------------------------------------------------------------------
+# 4. MOBILE — React Native (Expo)
+# ------------------------------------------------------------------------------
+expo >= 50.0.0
+expo-router >= 3.0.0        # Router basé sur les fichiers (identique Next.js)
+expo-notifications >= 0.27.0 # Notifications push natives (notes, paiements)
+expo-status-bar >= 1.11.0
+react-native >= 0.73.0
+@tanstack/react-query >= 5.0.0
+zustand >= 4.4.0
+zod >= 3.22.0
+
+# ------------------------------------------------------------------------------
+# 5. ASSURANCE QUALITÉ, TESTS E2E & HOOKS
+# ------------------------------------------------------------------------------
+@playwright/test >= 1.38.0  # Tests E2E automatisés (parcours parent/élève)
+husky >= 8.0.0              # Hooks Git de pré-commit
+lint-staged >= 14.0.0
+
+# ------------------------------------------------------------------------------
+# 6. PYTHON UTILITIES (Optionnel — Scripts de migration, analytics & tooling)
+# ------------------------------------------------------------------------------
+python-dotenv >= 1.0.0
+psycopg2-binary >= 2.9.0
+requests >= 2.31.0
+openpyxl >= 3.1.0
+pypdf >= 3.15.0
