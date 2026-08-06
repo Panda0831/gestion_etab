@@ -1,0 +1,29 @@
+{
+  "name": "gestion-etablissement",
+  "version": "1.0.0",
+  "description": "Système complet de gestion scolaire et d'établissement",
+  "main": "index.js",
+  "scripts": {
+    "prisma:generate": "prisma generate",
+    "prisma:db:push": "prisma db push",
+    "prisma:studio": "prisma studio",
+    "docker:up": "docker compose up -d",
+    "docker:down": "docker compose down"
+  },
+  "keywords": [
+    "school-management",
+    "nestjs",
+    "prisma",
+    "postgres",
+    "vue",
+    "react"
+  ],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "prisma": "^5.22.0"
+  },
+  "dependencies": {
+    "@prisma/client": "^5.22.0"
+  }
+}
