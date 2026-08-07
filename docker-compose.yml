@@ -1,6 +1,7 @@
 version: '3.8'
 
 services:
+
   postgres:
     image: postgres:15-alpine
     container_name: gestion_etab_postgres
@@ -13,7 +14,6 @@ services:
       - "${POSTGRES_PORT:-5432}:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      - ./base.sql:/docker-entrypoint-initdb.d/01_init.sql
 
   redis:
     image: redis:7-alpine
@@ -37,6 +37,45 @@ services:
     command: server /data --console-address ":9001"
     volumes:
       - minio_data:/data
+
+  backend:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+
+    container_name: gestion_etab_backend
+    restart: always
+
+    ports:
+      - "${BACKEND_PORT:-3000}:3000"
+
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres123}@postgres:5432/${POSTGRES_DB:-gestion_etab}?schema=public
+
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+
+      MINIO_ENDPOINT: minio
+      MINIO_PORT: 9000
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-minioadmin}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-minioadmin123}
+
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-7d}
+
+    depends_on:
+      - postgres
+      - redis
+      - minio
+
+    volumes:
+      - .:/app
+      - /app/node_modules
+
+    command: >
+      sh -c "npx prisma migrate deploy
+      --schema=/app/prisma/schema.prisma
+      && npm run start:dev"
 
 volumes:
   postgres_data:

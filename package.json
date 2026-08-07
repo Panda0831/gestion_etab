@@ -3,6 +3,10 @@
   "version": "1.0.0",
   "description": "Système complet de gestion scolaire et d'établissement",
   "main": "index.js",
+  "private": true,
+  "workspaces": [
+    "backend"
+  ],
   "scripts": {
     "prisma:generate": "prisma generate",
     "prisma:db:push": "prisma db push",
@@ -21,7 +25,8 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "prisma": "^5.22.0"
+    "prisma": "^5.22.0",
+    "typescript": "^5.9.3"
   },
   "dependencies": {
     "@prisma/client": "^5.22.0"

@@ -1,0 +1,112 @@
+{
+  "name": "gestion-etablissement-packages",
+  "version": "1.0.0",
+  "description": "Structure des packages/modules fonctionnels extraits de schema.prisma",
+  "packages": {
+    "pkg_utilisateurs": {
+      "description": "Gestion des utilisateurs, profils, rôles, authentification et pointage",
+      "models": [
+        "Utilisateur",
+        "Parent",
+        "Eleve",
+        "Pointage"
+      ],
+      "enums": [
+        "RoleUtilisateur",
+        "Sexe",
+        "StatutInscription",
+        "StatutPointage"
+      ]
+    },
+    "pkg_structure_scolaire": {
+      "description": "Structure académique et organisation de l'établissement",
+      "models": [
+        "Etablissement",
+        "Niveau",
+        "Classe",
+        "Matiere",
+        "ProfesseurMatiere",
+        "EmploiDuTemps"
+      ],
+      "enums": [
+        "TypeEtablissement",
+        "JourSemaine"
+      ]
+    },
+    "pkg_pedagogie": {
+      "description": "Gestion des cours, supports multimédias, évaluations, notes et bulletins",
+      "models": [
+        "Cours",
+        "CoursMedia",
+        "Evaluation",
+        "Note",
+        "Bulletin",
+        "BulletinDetail",
+        "ParametreNotation"
+      ],
+      "enums": [
+        "TypeCours",
+        "TypeMedia",
+        "TypeEvaluation",
+        "Periode",
+        "ModeNotation"
+      ]
+    },
+    "pkg_communication": {
+      "description": "Annonces, notifications, messagerie et chats de groupe",
+      "models": [
+        "Communication",
+        "Discussion",
+        "DiscussionMembre",
+        "Message",
+        "Fourniture"
+      ],
+      "enums": [
+        "TypeCommunication",
+        "SousTypeCommunication",
+        "TypeDiscussion"
+      ]
+    },
+    "pkg_clubs_evenements": {
+      "description": "Vie scolaire, clubs, activités et organisation d'événements",
+      "models": [
+        "ClubEvenement",
+        "Activite",
+        "ClubEvenementMembre",
+        "ClubEvenementOrganisateur"
+      ],
+      "enums": [
+        "TypeActivite",
+        "StatutEvenement",
+        "RoleMembre"
+      ]
+    },
+    "pkg_paiement": {
+      "description": "Transactions financières, réinscriptions et suivi des paiements",
+      "models": [
+        "TransactionFinanciere"
+      ],
+      "enums": [
+        "TypeTransaction",
+        "ModePaiement",
+        "StatutPaiement"
+      ]
+    },
+    "pkg_persistence": {
+      "description": "Logs d'audit et persistance système",
+      "models": [
+        "AuditLog"
+      ],
+      "enums": []
+    },
+    "pkg_integration_externe": {
+      "description": "Intégration des services tiers (Mobile Money, Email, Stockage S3/MinIO)",
+      "services": [
+        "API MVola",
+        "API Orange Money",
+        "Service Email (Nodemailer)",
+        "Service MinIO/S3"
+      ]
+    }
+  }
+}
