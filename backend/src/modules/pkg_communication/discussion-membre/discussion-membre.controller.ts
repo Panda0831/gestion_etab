@@ -19,16 +19,16 @@ export class DiscussionMembreController {
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.discussionMembreService.findOne(+id);
+    return this.discussionMembreService.findOne(id);
   }
 
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateDiscussionMembreDto: UpdateDiscussionMembreDto) {
-    return this.discussionMembreService.update(+id, updateDiscussionMembreDto);
+    return this.discussionMembreService.update(id, updateDiscussionMembreDto);
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.discussionMembreService.remove(+id);
+    return this.discussionMembreService.remove(id);
   }
 }

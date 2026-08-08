@@ -1,26 +1,51 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { PrismaService } from '../../../prisma/prisma.service';
 import { CreateClubEvenementMembreDto } from './dto/create-club-evenement-membre.dto';
 import { UpdateClubEvenementMembreDto } from './dto/update-club-evenement-membre.dto';
 
 @Injectable()
 export class ClubEvenementMembreService {
+  constructor(private readonly prisma: PrismaService) {}
+
   create(createClubEvenementMembreDto: CreateClubEvenementMembreDto) {
-    return 'This action adds a new clubEvenementMembre';
+    return this.prisma.clubEvenementMembre.create({
+      data: createClubEvenementMembreDto as any,
+    });
   }
 
   findAll() {
-    return `This action returns all clubEvenementMembre`;
+    return this.prisma.clubEvenementMembre.findMany({
+      include: {
+        clubEvenement: true,
+        eleve: { include: { utilisateur: true } },
+      },
+    });
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} clubEvenementMembre`;
+  async findOne(id: string) {
+    const item = await this.prisma.clubEvenementMembre.findUnique({
+      where: { id },
+      include: {
+        clubEvenement: true,
+        eleve: { include: { utilisateur: true } },
+      },
+    });
+    if (!item) {
+      throw new NotFoundException(`ClubEvenementMembre avec ID ${id} non trouvé`);
+    }
+    return item;
   }
 
-  update(id: number, updateClubEvenementMembreDto: UpdateClubEvenementMembreDto) {
-    return `This action updates a #${id} clubEvenementMembre`;
+  async update(id: string, updateClubEvenementMembreDto: UpdateClubEvenementMembreDto) {
+    await this.findOne(id);
+    return this.prisma.clubEvenementMembre.update({
+      where: { id },
+      data: updateClubEvenementMembreDto as any,
+    });
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} clubEvenementMembre`;
+  async remove(id: string) {
+    await this.findOne(id);
+    return this.prisma.clubEvenementMembre.delete({ where: { id } });
   }
 }

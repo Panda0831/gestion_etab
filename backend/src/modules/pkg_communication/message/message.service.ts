@@ -1,26 +1,51 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { PrismaService } from '../../../prisma/prisma.service';
 import { CreateMessageDto } from './dto/create-message.dto';
 import { UpdateMessageDto } from './dto/update-message.dto';
 
 @Injectable()
 export class MessageService {
+  constructor(private readonly prisma: PrismaService) {}
+
   create(createMessageDto: CreateMessageDto) {
-    return 'This action adds a new message';
+    return this.prisma.message.create({
+      data: createMessageDto as any,
+    });
   }
 
   findAll() {
-    return `This action returns all message`;
+    return this.prisma.message.findMany({
+      include: {
+        discussion: true,
+        expediteur: true,
+      },
+    });
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} message`;
+  async findOne(id: string) {
+    const item = await this.prisma.message.findUnique({
+      where: { id },
+      include: {
+        discussion: true,
+        expediteur: true,
+      },
+    });
+    if (!item) {
+      throw new NotFoundException(`Message avec ID ${id} non trouvé`);
+    }
+    return item;
   }
 
-  update(id: number, updateMessageDto: UpdateMessageDto) {
-    return `This action updates a #${id} message`;
+  async update(id: string, updateMessageDto: UpdateMessageDto) {
+    await this.findOne(id);
+    return this.prisma.message.update({
+      where: { id },
+      data: updateMessageDto as any,
+    });
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} message`;
+  async remove(id: string) {
+    await this.findOne(id);
+    return this.prisma.message.delete({ where: { id } });
   }
 }

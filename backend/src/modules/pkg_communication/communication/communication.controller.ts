@@ -19,16 +19,16 @@ export class CommunicationController {
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.communicationService.findOne(+id);
+    return this.communicationService.findOne(id);
   }
 
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateCommunicationDto: UpdateCommunicationDto) {
-    return this.communicationService.update(+id, updateCommunicationDto);
+    return this.communicationService.update(id, updateCommunicationDto);
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.communicationService.remove(+id);
+    return this.communicationService.remove(id);
   }
 }

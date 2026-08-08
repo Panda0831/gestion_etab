@@ -1,26 +1,51 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { PrismaService } from '../../../prisma/prisma.service';
 import { CreateClubEvenementOrganisateurDto } from './dto/create-club-evenement-organisateur.dto';
 import { UpdateClubEvenementOrganisateurDto } from './dto/update-club-evenement-organisateur.dto';
 
 @Injectable()
 export class ClubEvenementOrganisateurService {
+  constructor(private readonly prisma: PrismaService) {}
+
   create(createClubEvenementOrganisateurDto: CreateClubEvenementOrganisateurDto) {
-    return 'This action adds a new clubEvenementOrganisateur';
+    return this.prisma.clubEvenementOrganisateur.create({
+      data: createClubEvenementOrganisateurDto as any,
+    });
   }
 
   findAll() {
-    return `This action returns all clubEvenementOrganisateur`;
+    return this.prisma.clubEvenementOrganisateur.findMany({
+      include: {
+        clubEvenement: true,
+        utilisateur: true,
+      },
+    });
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} clubEvenementOrganisateur`;
+  async findOne(id: string) {
+    const item = await this.prisma.clubEvenementOrganisateur.findUnique({
+      where: { id },
+      include: {
+        clubEvenement: true,
+        utilisateur: true,
+      },
+    });
+    if (!item) {
+      throw new NotFoundException(`ClubEvenementOrganisateur avec ID ${id} non trouvé`);
+    }
+    return item;
   }
 
-  update(id: number, updateClubEvenementOrganisateurDto: UpdateClubEvenementOrganisateurDto) {
-    return `This action updates a #${id} clubEvenementOrganisateur`;
+  async update(id: string, updateClubEvenementOrganisateurDto: UpdateClubEvenementOrganisateurDto) {
+    await this.findOne(id);
+    return this.prisma.clubEvenementOrganisateur.update({
+      where: { id },
+      data: updateClubEvenementOrganisateurDto as any,
+    });
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} clubEvenementOrganisateur`;
+  async remove(id: string) {
+    await this.findOne(id);
+    return this.prisma.clubEvenementOrganisateur.delete({ where: { id } });
   }
 }

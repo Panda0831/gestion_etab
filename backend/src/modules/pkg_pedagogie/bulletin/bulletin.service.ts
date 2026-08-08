@@ -1,26 +1,51 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { PrismaService } from '../../../prisma/prisma.service';
 import { CreateBulletinDto } from './dto/create-bulletin.dto';
 import { UpdateBulletinDto } from './dto/update-bulletin.dto';
 
 @Injectable()
 export class BulletinService {
+  constructor(private readonly prisma: PrismaService) {}
+
   create(createBulletinDto: CreateBulletinDto) {
-    return 'This action adds a new bulletin';
+    return this.prisma.bulletin.create({
+      data: createBulletinDto as any,
+    });
   }
 
   findAll() {
-    return `This action returns all bulletin`;
+    return this.prisma.bulletin.findMany({
+      include: {
+        eleve: { include: { utilisateur: true } },
+        details: { include: { note: true } },
+      },
+    });
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} bulletin`;
+  async findOne(id: string) {
+    const item = await this.prisma.bulletin.findUnique({
+      where: { id },
+      include: {
+        eleve: { include: { utilisateur: true } },
+        details: { include: { note: true } },
+      },
+    });
+    if (!item) {
+      throw new NotFoundException(`Bulletin avec ID ${id} non trouvé`);
+    }
+    return item;
   }
 
-  update(id: number, updateBulletinDto: UpdateBulletinDto) {
-    return `This action updates a #${id} bulletin`;
+  async update(id: string, updateBulletinDto: UpdateBulletinDto) {
+    await this.findOne(id);
+    return this.prisma.bulletin.update({
+      where: { id },
+      data: updateBulletinDto as any,
+    });
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} bulletin`;
+  async remove(id: string) {
+    await this.findOne(id);
+    return this.prisma.bulletin.delete({ where: { id } });
   }
 }

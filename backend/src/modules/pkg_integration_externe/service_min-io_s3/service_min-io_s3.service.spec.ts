@@ -1,3 +1,4 @@
+import { PrismaService } from '../../../prisma/prisma.service';
 import { Test, TestingModule } from '@nestjs/testing';
 import { ServiceMinIoS3Service } from './service_min-io_s3.service';
 
@@ -6,7 +7,13 @@ describe('ServiceMinIoS3Service', () => {
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [ServiceMinIoS3Service],
+      providers: [
+        ServiceMinIoS3Service,
+        {
+          provide: PrismaService,
+          useValue: {},
+        },
+      ],
     }).compile();
 
     service = module.get<ServiceMinIoS3Service>(ServiceMinIoS3Service);

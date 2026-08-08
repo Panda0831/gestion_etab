@@ -19,16 +19,16 @@ export class MatiereController {
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.matiereService.findOne(+id);
+    return this.matiereService.findOne(id);
   }
 
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateMatiereDto: UpdateMatiereDto) {
-    return this.matiereService.update(+id, updateMatiereDto);
+    return this.matiereService.update(id, updateMatiereDto);
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.matiereService.remove(+id);
+    return this.matiereService.remove(id);
   }
 }

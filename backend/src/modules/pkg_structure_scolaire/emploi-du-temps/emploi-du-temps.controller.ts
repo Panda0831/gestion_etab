@@ -19,16 +19,16 @@ export class EmploiDuTempsController {
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.emploiDuTempsService.findOne(+id);
+    return this.emploiDuTempsService.findOne(id);
   }
 
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateEmploiDuTempDto: UpdateEmploiDuTempDto) {
-    return this.emploiDuTempsService.update(+id, updateEmploiDuTempDto);
+    return this.emploiDuTempsService.update(id, updateEmploiDuTempDto);
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.emploiDuTempsService.remove(+id);
+    return this.emploiDuTempsService.remove(id);
   }
 }

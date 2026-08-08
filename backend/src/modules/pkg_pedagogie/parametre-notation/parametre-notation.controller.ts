@@ -19,16 +19,16 @@ export class ParametreNotationController {
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.parametreNotationService.findOne(+id);
+    return this.parametreNotationService.findOne(id);
   }
 
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateParametreNotationDto: UpdateParametreNotationDto) {
-    return this.parametreNotationService.update(+id, updateParametreNotationDto);
+    return this.parametreNotationService.update(id, updateParametreNotationDto);
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.parametreNotationService.remove(+id);
+    return this.parametreNotationService.remove(id);
   }
 }

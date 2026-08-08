@@ -1,26 +1,49 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { PrismaService } from '../../../prisma/prisma.service';
 import { CreateCoursMediaDto } from './dto/create-cours-media.dto';
 import { UpdateCoursMediaDto } from './dto/update-cours-media.dto';
 
 @Injectable()
 export class CoursMediaService {
+  constructor(private readonly prisma: PrismaService) {}
+
   create(createCoursMediaDto: CreateCoursMediaDto) {
-    return 'This action adds a new coursMedia';
+    return this.prisma.coursMedia.create({
+      data: createCoursMediaDto as any,
+    });
   }
 
   findAll() {
-    return `This action returns all coursMedia`;
+    return this.prisma.coursMedia.findMany({
+      include: {
+        cours: true,
+      },
+    });
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} coursMedia`;
+  async findOne(id: string) {
+    const item = await this.prisma.coursMedia.findUnique({
+      where: { id },
+      include: {
+        cours: true,
+      },
+    });
+    if (!item) {
+      throw new NotFoundException(`CoursMedia avec ID ${id} non trouvé`);
+    }
+    return item;
   }
 
-  update(id: number, updateCoursMediaDto: UpdateCoursMediaDto) {
-    return `This action updates a #${id} coursMedia`;
+  async update(id: string, updateCoursMediaDto: UpdateCoursMediaDto) {
+    await this.findOne(id);
+    return this.prisma.coursMedia.update({
+      where: { id },
+      data: updateCoursMediaDto as any,
+    });
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} coursMedia`;
+  async remove(id: string) {
+    await this.findOne(id);
+    return this.prisma.coursMedia.delete({ where: { id } });
   }
 }

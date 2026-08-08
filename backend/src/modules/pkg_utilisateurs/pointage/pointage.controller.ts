@@ -19,16 +19,16 @@ export class PointageController {
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.pointageService.findOne(+id);
+    return this.pointageService.findOne(id);
   }
 
   @Patch(':id')
   update(@Param('id') id: string, @Body() updatePointageDto: UpdatePointageDto) {
-    return this.pointageService.update(+id, updatePointageDto);
+    return this.pointageService.update(id, updatePointageDto);
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.pointageService.remove(+id);
+    return this.pointageService.remove(id);
   }
 }

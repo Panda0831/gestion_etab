@@ -1,26 +1,38 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { PrismaService } from '../../../prisma/prisma.service';
 import { CreateEleveDto } from './dto/create-eleve.dto';
 import { UpdateEleveDto } from './dto/update-eleve.dto';
 
 @Injectable()
 export class EleveService {
+  constructor(private readonly prisma: PrismaService) {}
+
   create(createEleveDto: CreateEleveDto) {
-    return 'This action adds a new eleve';
+    return this.prisma.eleve.create({ data: createEleveDto });
   }
 
   findAll() {
-    return `This action returns all eleve`;
+    return this.prisma.eleve.findMany({
+      include: { utilisateur: true, classe: true, parent: true },
+    });
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} eleve`;
+  async findOne(id: string) {
+    const eleve = await this.prisma.eleve.findUnique({
+      where: { id },
+      include: { utilisateur: true, classe: true, parent: true },
+    });
+    if (!eleve) throw new NotFoundException(`Élève avec ID ${id} non trouvé`);
+    return eleve;
   }
 
-  update(id: number, updateEleveDto: UpdateEleveDto) {
-    return `This action updates a #${id} eleve`;
+  async update(id: string, updateEleveDto: UpdateEleveDto) {
+    await this.findOne(id);
+    return this.prisma.eleve.update({ where: { id }, data: updateEleveDto });
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} eleve`;
+  async remove(id: string) {
+    await this.findOne(id);
+    return this.prisma.eleve.delete({ where: { id } });
   }
 }

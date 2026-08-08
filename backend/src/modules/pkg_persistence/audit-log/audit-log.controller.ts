@@ -19,16 +19,16 @@ export class AuditLogController {
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.auditLogService.findOne(+id);
+    return this.auditLogService.findOne(id);
   }
 
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateAuditLogDto: UpdateAuditLogDto) {
-    return this.auditLogService.update(+id, updateAuditLogDto);
+    return this.auditLogService.update(id, updateAuditLogDto);
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.auditLogService.remove(+id);
+    return this.auditLogService.remove(id);
   }
 }

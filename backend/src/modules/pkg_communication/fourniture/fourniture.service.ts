@@ -1,26 +1,49 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { PrismaService } from '../../../prisma/prisma.service';
 import { CreateFournitureDto } from './dto/create-fourniture.dto';
 import { UpdateFournitureDto } from './dto/update-fourniture.dto';
 
 @Injectable()
 export class FournitureService {
+  constructor(private readonly prisma: PrismaService) {}
+
   create(createFournitureDto: CreateFournitureDto) {
-    return 'This action adds a new fourniture';
+    return this.prisma.fourniture.create({
+      data: createFournitureDto as any,
+    });
   }
 
   findAll() {
-    return `This action returns all fourniture`;
+    return this.prisma.fourniture.findMany({
+      include: {
+        niveau: true,
+      },
+    });
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} fourniture`;
+  async findOne(id: string) {
+    const item = await this.prisma.fourniture.findUnique({
+      where: { id },
+      include: {
+        niveau: true,
+      },
+    });
+    if (!item) {
+      throw new NotFoundException(`Fourniture avec ID ${id} non trouvée`);
+    }
+    return item;
   }
 
-  update(id: number, updateFournitureDto: UpdateFournitureDto) {
-    return `This action updates a #${id} fourniture`;
+  async update(id: string, updateFournitureDto: UpdateFournitureDto) {
+    await this.findOne(id);
+    return this.prisma.fourniture.update({
+      where: { id },
+      data: updateFournitureDto as any,
+    });
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} fourniture`;
+  async remove(id: string) {
+    await this.findOne(id);
+    return this.prisma.fourniture.delete({ where: { id } });
   }
 }

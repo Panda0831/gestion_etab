@@ -19,16 +19,16 @@ export class FournitureController {
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.fournitureService.findOne(+id);
+    return this.fournitureService.findOne(id);
   }
 
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateFournitureDto: UpdateFournitureDto) {
-    return this.fournitureService.update(+id, updateFournitureDto);
+    return this.fournitureService.update(id, updateFournitureDto);
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.fournitureService.remove(+id);
+    return this.fournitureService.remove(id);
   }
 }

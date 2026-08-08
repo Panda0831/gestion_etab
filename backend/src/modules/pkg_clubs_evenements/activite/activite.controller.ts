@@ -19,16 +19,16 @@ export class ActiviteController {
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.activiteService.findOne(+id);
+    return this.activiteService.findOne(id);
   }
 
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateActiviteDto: UpdateActiviteDto) {
-    return this.activiteService.update(+id, updateActiviteDto);
+    return this.activiteService.update(id, updateActiviteDto);
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.activiteService.remove(+id);
+    return this.activiteService.remove(id);
   }
 }

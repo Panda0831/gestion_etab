@@ -19,16 +19,16 @@ export class EleveController {
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.eleveService.findOne(+id);
+    return this.eleveService.findOne(id);
   }
 
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateEleveDto: UpdateEleveDto) {
-    return this.eleveService.update(+id, updateEleveDto);
+    return this.eleveService.update(id, updateEleveDto);
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.eleveService.remove(+id);
+    return this.eleveService.remove(id);
   }
 }

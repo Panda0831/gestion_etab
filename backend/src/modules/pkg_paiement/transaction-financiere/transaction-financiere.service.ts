@@ -1,26 +1,51 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { PrismaService } from '../../../prisma/prisma.service';
 import { CreateTransactionFinanciereDto } from './dto/create-transaction-financiere.dto';
 import { UpdateTransactionFinanciereDto } from './dto/update-transaction-financiere.dto';
 
 @Injectable()
 export class TransactionFinanciereService {
+  constructor(private readonly prisma: PrismaService) {}
+
   create(createTransactionFinanciereDto: CreateTransactionFinanciereDto) {
-    return 'This action adds a new transactionFinanciere';
+    return this.prisma.transactionFinanciere.create({
+      data: createTransactionFinanciereDto as any,
+    });
   }
 
   findAll() {
-    return `This action returns all transactionFinanciere`;
+    return this.prisma.transactionFinanciere.findMany({
+      include: {
+        eleve: { include: { utilisateur: true } },
+        valideur: true,
+      },
+    });
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} transactionFinanciere`;
+  async findOne(id: string) {
+    const item = await this.prisma.transactionFinanciere.findUnique({
+      where: { id },
+      include: {
+        eleve: { include: { utilisateur: true } },
+        valideur: true,
+      },
+    });
+    if (!item) {
+      throw new NotFoundException(`Transaction financière avec ID ${id} non trouvée`);
+    }
+    return item;
   }
 
-  update(id: number, updateTransactionFinanciereDto: UpdateTransactionFinanciereDto) {
-    return `This action updates a #${id} transactionFinanciere`;
+  async update(id: string, updateTransactionFinanciereDto: UpdateTransactionFinanciereDto) {
+    await this.findOne(id);
+    return this.prisma.transactionFinanciere.update({
+      where: { id },
+      data: updateTransactionFinanciereDto as any,
+    });
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} transactionFinanciere`;
+  async remove(id: string) {
+    await this.findOne(id);
+    return this.prisma.transactionFinanciere.delete({ where: { id } });
   }
 }

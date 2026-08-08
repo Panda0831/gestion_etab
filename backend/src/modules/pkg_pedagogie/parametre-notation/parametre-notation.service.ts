@@ -1,26 +1,49 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { PrismaService } from '../../../prisma/prisma.service';
 import { CreateParametreNotationDto } from './dto/create-parametre-notation.dto';
 import { UpdateParametreNotationDto } from './dto/update-parametre-notation.dto';
 
 @Injectable()
 export class ParametreNotationService {
+  constructor(private readonly prisma: PrismaService) {}
+
   create(createParametreNotationDto: CreateParametreNotationDto) {
-    return 'This action adds a new parametreNotation';
+    return this.prisma.parametreNotation.create({
+      data: createParametreNotationDto as any,
+    });
   }
 
   findAll() {
-    return `This action returns all parametreNotation`;
+    return this.prisma.parametreNotation.findMany({
+      include: {
+        etablissement: true,
+      },
+    });
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} parametreNotation`;
+  async findOne(id: string) {
+    const item = await this.prisma.parametreNotation.findUnique({
+      where: { id },
+      include: {
+        etablissement: true,
+      },
+    });
+    if (!item) {
+      throw new NotFoundException(`Paramètre de notation avec ID ${id} non trouvé`);
+    }
+    return item;
   }
 
-  update(id: number, updateParametreNotationDto: UpdateParametreNotationDto) {
-    return `This action updates a #${id} parametreNotation`;
+  async update(id: string, updateParametreNotationDto: UpdateParametreNotationDto) {
+    await this.findOne(id);
+    return this.prisma.parametreNotation.update({
+      where: { id },
+      data: updateParametreNotationDto as any,
+    });
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} parametreNotation`;
+  async remove(id: string) {
+    await this.findOne(id);
+    return this.prisma.parametreNotation.delete({ where: { id } });
   }
 }

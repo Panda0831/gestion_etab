@@ -19,16 +19,16 @@ export class ClubEvenementOrganisateurController {
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.clubEvenementOrganisateurService.findOne(+id);
+    return this.clubEvenementOrganisateurService.findOne(id);
   }
 
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateClubEvenementOrganisateurDto: UpdateClubEvenementOrganisateurDto) {
-    return this.clubEvenementOrganisateurService.update(+id, updateClubEvenementOrganisateurDto);
+    return this.clubEvenementOrganisateurService.update(id, updateClubEvenementOrganisateurDto);
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.clubEvenementOrganisateurService.remove(+id);
+    return this.clubEvenementOrganisateurService.remove(id);
   }
 }

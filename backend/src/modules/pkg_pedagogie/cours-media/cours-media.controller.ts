@@ -19,16 +19,16 @@ export class CoursMediaController {
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.coursMediaService.findOne(+id);
+    return this.coursMediaService.findOne(id);
   }
 
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateCoursMediaDto: UpdateCoursMediaDto) {
-    return this.coursMediaService.update(+id, updateCoursMediaDto);
+    return this.coursMediaService.update(id, updateCoursMediaDto);
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.coursMediaService.remove(+id);
+    return this.coursMediaService.remove(id);
   }
 }

@@ -28,7 +28,7 @@ export class NiveauService {
       include: {
         etablissement: true,
         classes: true,
-        matieres: true,
+        fournitures: true,
       },
     });
     if (!niveau) {

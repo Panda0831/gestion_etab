@@ -1,26 +1,36 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { PrismaService } from '../../../prisma/prisma.service';
 import { CreateMatiereDto } from './dto/create-matiere.dto';
 import { UpdateMatiereDto } from './dto/update-matiere.dto';
 
 @Injectable()
 export class MatiereService {
+  constructor(private readonly prisma: PrismaService) {}
+
   create(createMatiereDto: CreateMatiereDto) {
-    return 'This action adds a new matiere';
+    return this.prisma.matiere.create({ data: createMatiereDto });
   }
 
   findAll() {
-    return `This action returns all matiere`;
+    return this.prisma.matiere.findMany({ include: { etablissement: true } });
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} matiere`;
+  async findOne(id: string) {
+    const matiere = await this.prisma.matiere.findUnique({
+      where: { id },
+      include: { etablissement: true },
+    });
+    if (!matiere) throw new NotFoundException(`Matière avec ID ${id} non trouvée`);
+    return matiere;
   }
 
-  update(id: number, updateMatiereDto: UpdateMatiereDto) {
-    return `This action updates a #${id} matiere`;
+  async update(id: string, updateMatiereDto: UpdateMatiereDto) {
+    await this.findOne(id);
+    return this.prisma.matiere.update({ where: { id }, data: updateMatiereDto });
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} matiere`;
+  async remove(id: string) {
+    await this.findOne(id);
+    return this.prisma.matiere.delete({ where: { id } });
   }
 }

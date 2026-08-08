@@ -1,3 +1,4 @@
+import { PrismaService } from '../../../prisma/prisma.service';
 import { Test, TestingModule } from '@nestjs/testing';
 import { ParametreNotationService } from './parametre-notation.service';
 
@@ -6,7 +7,13 @@ describe('ParametreNotationService', () => {
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [ParametreNotationService],
+      providers: [
+        ParametreNotationService,
+        {
+          provide: PrismaService,
+          useValue: {},
+        },
+      ],
     }).compile();
 
     service = module.get<ParametreNotationService>(ParametreNotationService);

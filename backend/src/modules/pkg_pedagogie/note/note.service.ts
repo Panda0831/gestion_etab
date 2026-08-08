@@ -1,26 +1,53 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { PrismaService } from '../../../prisma/prisma.service';
 import { CreateNoteDto } from './dto/create-note.dto';
 import { UpdateNoteDto } from './dto/update-note.dto';
 
 @Injectable()
 export class NoteService {
+  constructor(private readonly prisma: PrismaService) {}
+
   create(createNoteDto: CreateNoteDto) {
-    return 'This action adds a new note';
+    return this.prisma.note.create({
+      data: createNoteDto as any,
+    });
   }
 
   findAll() {
-    return `This action returns all note`;
+    return this.prisma.note.findMany({
+      include: {
+        evaluation: true,
+        eleve: { include: { utilisateur: true } },
+        auteurSaisie: true,
+      },
+    });
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} note`;
+  async findOne(id: string) {
+    const item = await this.prisma.note.findUnique({
+      where: { id },
+      include: {
+        evaluation: true,
+        eleve: { include: { utilisateur: true } },
+        auteurSaisie: true,
+      },
+    });
+    if (!item) {
+      throw new NotFoundException(`Note avec ID ${id} non trouvée`);
+    }
+    return item;
   }
 
-  update(id: number, updateNoteDto: UpdateNoteDto) {
-    return `This action updates a #${id} note`;
+  async update(id: string, updateNoteDto: UpdateNoteDto) {
+    await this.findOne(id);
+    return this.prisma.note.update({
+      where: { id },
+      data: updateNoteDto as any,
+    });
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} note`;
+  async remove(id: string) {
+    await this.findOne(id);
+    return this.prisma.note.delete({ where: { id } });
   }
 }

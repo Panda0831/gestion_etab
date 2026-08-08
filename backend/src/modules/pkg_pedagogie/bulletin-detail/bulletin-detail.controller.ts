@@ -19,16 +19,16 @@ export class BulletinDetailController {
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.bulletinDetailService.findOne(+id);
+    return this.bulletinDetailService.findOne(id);
   }
 
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateBulletinDetailDto: UpdateBulletinDetailDto) {
-    return this.bulletinDetailService.update(+id, updateBulletinDetailDto);
+    return this.bulletinDetailService.update(id, updateBulletinDetailDto);
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.bulletinDetailService.remove(+id);
+    return this.bulletinDetailService.remove(id);
   }
 }

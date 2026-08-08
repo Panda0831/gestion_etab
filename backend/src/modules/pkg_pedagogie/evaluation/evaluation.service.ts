@@ -1,26 +1,55 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { PrismaService } from '../../../prisma/prisma.service';
 import { CreateEvaluationDto } from './dto/create-evaluation.dto';
 import { UpdateEvaluationDto } from './dto/update-evaluation.dto';
 
 @Injectable()
 export class EvaluationService {
+  constructor(private readonly prisma: PrismaService) {}
+
   create(createEvaluationDto: CreateEvaluationDto) {
-    return 'This action adds a new evaluation';
+    return this.prisma.evaluation.create({
+      data: createEvaluationDto as any,
+    });
   }
 
   findAll() {
-    return `This action returns all evaluation`;
+    return this.prisma.evaluation.findMany({
+      include: {
+        matiere: true,
+        classe: true,
+        professeur: true,
+        notes: true,
+      },
+    });
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} evaluation`;
+  async findOne(id: string) {
+    const item = await this.prisma.evaluation.findUnique({
+      where: { id },
+      include: {
+        matiere: true,
+        classe: true,
+        professeur: true,
+        notes: true,
+      },
+    });
+    if (!item) {
+      throw new NotFoundException(`Évaluation avec ID ${id} non trouvée`);
+    }
+    return item;
   }
 
-  update(id: number, updateEvaluationDto: UpdateEvaluationDto) {
-    return `This action updates a #${id} evaluation`;
+  async update(id: string, updateEvaluationDto: UpdateEvaluationDto) {
+    await this.findOne(id);
+    return this.prisma.evaluation.update({
+      where: { id },
+      data: updateEvaluationDto as any,
+    });
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} evaluation`;
+  async remove(id: string) {
+    await this.findOne(id);
+    return this.prisma.evaluation.delete({ where: { id } });
   }
 }

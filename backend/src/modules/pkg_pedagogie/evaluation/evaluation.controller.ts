@@ -19,16 +19,16 @@ export class EvaluationController {
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.evaluationService.findOne(+id);
+    return this.evaluationService.findOne(id);
   }
 
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateEvaluationDto: UpdateEvaluationDto) {
-    return this.evaluationService.update(+id, updateEvaluationDto);
+    return this.evaluationService.update(id, updateEvaluationDto);
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.evaluationService.remove(+id);
+    return this.evaluationService.remove(id);
   }
 }

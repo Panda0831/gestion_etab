@@ -1,26 +1,39 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { PrismaService } from '../../../prisma/prisma.service';
 import { CreatePointageDto } from './dto/create-pointage.dto';
 import { UpdatePointageDto } from './dto/update-pointage.dto';
 
 @Injectable()
 export class PointageService {
+  constructor(private readonly prisma: PrismaService) {}
+
   create(createPointageDto: CreatePointageDto) {
-    return 'This action adds a new pointage';
+    return this.prisma.pointage.create({ data: createPointageDto });
   }
 
   findAll() {
-    return `This action returns all pointage`;
+    return this.prisma.pointage.findMany({
+      orderBy: { datePointage: 'desc' },
+      include: { professeur: true },
+    });
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} pointage`;
+  async findOne(id: string) {
+    const pointage = await this.prisma.pointage.findUnique({
+      where: { id },
+      include: { professeur: true },
+    });
+    if (!pointage) throw new NotFoundException(`Pointage avec ID ${id} non trouvé`);
+    return pointage;
   }
 
-  update(id: number, updatePointageDto: UpdatePointageDto) {
-    return `This action updates a #${id} pointage`;
+  async update(id: string, updatePointageDto: UpdatePointageDto) {
+    await this.findOne(id);
+    return this.prisma.pointage.update({ where: { id }, data: updatePointageDto });
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} pointage`;
+  async remove(id: string) {
+    await this.findOne(id);
+    return this.prisma.pointage.delete({ where: { id } });
   }
 }
