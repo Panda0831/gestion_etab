@@ -1,26 +1,55 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { PrismaService } from '../../../prisma/prisma.service';
 import { CreateNiveauDto } from './dto/create-niveau.dto';
 import { UpdateNiveauDto } from './dto/update-niveau.dto';
 
 @Injectable()
 export class NiveauService {
-  create(createNiveauDto: CreateNiveauDto) {
-    return 'This action adds a new niveau';
+  constructor(private readonly prisma: PrismaService) {}
+
+  async create(createNiveauDto: CreateNiveauDto) {
+    return this.prisma.niveau.create({
+      data: createNiveauDto,
+    });
   }
 
-  findAll() {
-    return `This action returns all niveau`;
+  async findAll() {
+    return this.prisma.niveau.findMany({
+      include: {
+        etablissement: { select: { id: true, nom: true } },
+        classes: true,
+      },
+    });
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} niveau`;
+  async findOne(id: string) {
+    const niveau = await this.prisma.niveau.findUnique({
+      where: { id },
+      include: {
+        etablissement: true,
+        classes: true,
+        matieres: true,
+      },
+    });
+    if (!niveau) {
+      throw new NotFoundException(`Niveau avec ID ${id} non trouvé`);
+    }
+    return niveau;
   }
 
-  update(id: number, updateNiveauDto: UpdateNiveauDto) {
-    return `This action updates a #${id} niveau`;
+  async update(id: string, updateNiveauDto: UpdateNiveauDto) {
+    await this.findOne(id);
+    return this.prisma.niveau.update({
+      where: { id },
+      data: updateNiveauDto,
+    });
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} niveau`;
+  async remove(id: string) {
+    await this.findOne(id);
+    return this.prisma.niveau.delete({
+      where: { id },
+    });
   }
 }
+

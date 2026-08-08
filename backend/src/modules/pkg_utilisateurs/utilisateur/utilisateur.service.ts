@@ -1,26 +1,57 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { PrismaService } from '../../../prisma/prisma.service';
 import { CreateUtilisateurDto } from './dto/create-utilisateur.dto';
 import { UpdateUtilisateurDto } from './dto/update-utilisateur.dto';
 
 @Injectable()
 export class UtilisateurService {
-  create(createUtilisateurDto: CreateUtilisateurDto) {
-    return 'This action adds a new utilisateur';
+  constructor(private readonly prisma: PrismaService) {}
+
+  async create(createUtilisateurDto: CreateUtilisateurDto) {
+    return this.prisma.utilisateur.create({
+      data: createUtilisateurDto,
+    });
   }
 
-  findAll() {
-    return `This action returns all utilisateur`;
+  async findAll() {
+    return this.prisma.utilisateur.findMany({
+      orderBy: { createdAt: 'desc' },
+      include: {
+        etablissement: {
+          select: { id: true, nom: true, type: true },
+        },
+      },
+    });
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} utilisateur`;
+  async findOne(id: string) {
+    const utilisateur = await this.prisma.utilisateur.findUnique({
+      where: { id },
+      include: {
+        etablissement: true,
+        eleve: true,
+        parent: true,
+      },
+    });
+    if (!utilisateur) {
+      throw new NotFoundException(`Utilisateur avec ID ${id} non trouvé`);
+    }
+    return utilisateur;
   }
 
-  update(id: number, updateUtilisateurDto: UpdateUtilisateurDto) {
-    return `This action updates a #${id} utilisateur`;
+  async update(id: string, updateUtilisateurDto: UpdateUtilisateurDto) {
+    await this.findOne(id);
+    return this.prisma.utilisateur.update({
+      where: { id },
+      data: updateUtilisateurDto,
+    });
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} utilisateur`;
+  async remove(id: string) {
+    await this.findOne(id);
+    return this.prisma.utilisateur.delete({
+      where: { id },
+    });
   }
 }
+

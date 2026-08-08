@@ -1,26 +1,47 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { PrismaService } from '../../../prisma/prisma.service';
 import { CreateEtablissementDto } from './dto/create-etablissement.dto';
 import { UpdateEtablissementDto } from './dto/update-etablissement.dto';
 
 @Injectable()
 export class EtablissementService {
-  create(createEtablissementDto: CreateEtablissementDto) {
-    return 'This action adds a new etablissement';
+  constructor(private readonly prisma: PrismaService) {}
+
+  async create(createEtablissementDto: CreateEtablissementDto) {
+    return this.prisma.etablissement.create({
+      data: createEtablissementDto,
+    });
   }
 
-  findAll() {
-    return `This action returns all etablissement`;
+  async findAll() {
+    return this.prisma.etablissement.findMany({
+      orderBy: { createdAt: 'desc' },
+    });
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} etablissement`;
+  async findOne(id: string) {
+    const etablissement = await this.prisma.etablissement.findUnique({
+      where: { id },
+    });
+    if (!etablissement) {
+      throw new NotFoundException(`Établissement avec ID ${id} non trouvé`);
+    }
+    return etablissement;
   }
 
-  update(id: number, updateEtablissementDto: UpdateEtablissementDto) {
-    return `This action updates a #${id} etablissement`;
+  async update(id: string, updateEtablissementDto: UpdateEtablissementDto) {
+    await this.findOne(id);
+    return this.prisma.etablissement.update({
+      where: { id },
+      data: updateEtablissementDto,
+    });
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} etablissement`;
+  async remove(id: string) {
+    await this.findOne(id);
+    return this.prisma.etablissement.delete({
+      where: { id },
+    });
   }
 }
+
