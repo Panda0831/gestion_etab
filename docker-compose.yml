@@ -50,6 +50,9 @@ services:
       - "${BACKEND_PORT:-3000}:3000"
 
     environment:
+      CHOKIDAR_USEPOLLING: "true"
+      WATCHPACK_POLLING: "true"
+
       DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres123}@postgres:5432/${POSTGRES_DB:-gestion_etab}?schema=public
 
       REDIS_HOST: redis
@@ -75,8 +78,8 @@ services:
     command: >
       sh -c "npx prisma migrate deploy
       --schema=/app/prisma/schema.prisma
-      && npm run start:dev"
-
+      && npm run start:dev --workspace=backend"
+      
 volumes:
   postgres_data:
   redis_data:

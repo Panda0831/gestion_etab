@@ -4,27 +4,21 @@ RUN apk add --no-cache openssl
 
 WORKDIR /app
 
-# Package.json du projet Prisma (racine)
-COPY package*.json ./
+# Copier uniquement les fichiers de dépendances
+COPY package.json package-lock.json ./
 
-# Package.json du backend NestJS
-COPY backend/package*.json ./backend/
+# Copier le package du workspace backend
+COPY backend/package.json ./backend/package.json
 
-# Installer les dépendances Prisma
+# Installer toutes les dépendances du workspace
 RUN npm install
 
 # Copier Prisma
 COPY prisma ./prisma
 
-# Copier le backend NestJS
-COPY backend/. ./backend/
-
 # Générer Prisma Client
-RUN npx prisma generate --schema=/app/prisma/schema.prisma
-
-# Le backend NestJS se trouve ici
-WORKDIR /app/backend
+RUN npx prisma generate --schema=./prisma/schema.prisma
 
 EXPOSE 3000
 
-CMD ["npm", "run", "start:dev"]
+CMD ["npm", "run", "start:dev", "--workspace=backend"]
