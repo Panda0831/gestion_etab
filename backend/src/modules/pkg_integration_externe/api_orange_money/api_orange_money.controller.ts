@@ -1,4 +1,12 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+} from '@nestjs/common';
 import { ApiOrangeMoneyService } from './api_orange_money.service';
 import { CreateApiOrangeMoneyDto } from './dto/create-api_orange_money.dto';
 import { UpdateApiOrangeMoneyDto } from './dto/update-api_orange_money.dto';
@@ -23,7 +31,10 @@ export class ApiOrangeMoneyController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateApiOrangeMoneyDto: UpdateApiOrangeMoneyDto) {
+  update(
+    @Param('id') id: string,
+    @Body() updateApiOrangeMoneyDto: UpdateApiOrangeMoneyDto,
+  ) {
     return this.apiOrangeMoneyService.update(+id, updateApiOrangeMoneyDto);
   }
 

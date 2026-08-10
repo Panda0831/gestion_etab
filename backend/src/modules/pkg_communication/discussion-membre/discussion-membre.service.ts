@@ -36,7 +36,10 @@ export class DiscussionMembreService {
     return item;
   }
 
-  async update(id: string, updateDiscussionMembreDto: UpdateDiscussionMembreDto) {
+  async update(
+    id: string,
+    updateDiscussionMembreDto: UpdateDiscussionMembreDto,
+  ) {
     await this.findOne(id);
     return this.prisma.discussionMembre.update({
       where: { id },

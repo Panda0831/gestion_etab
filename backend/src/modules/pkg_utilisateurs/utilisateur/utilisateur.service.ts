@@ -1,20 +1,31 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
+import * as bcrypt from 'bcryptjs';
 import { PrismaService } from '../../../prisma/prisma.service';
 import { CreateUtilisateurDto } from './dto/create-utilisateur.dto';
 import { UpdateUtilisateurDto } from './dto/update-utilisateur.dto';
+
+const SALT_ROUNDS = 10;
 
 @Injectable()
 export class UtilisateurService {
   constructor(private readonly prisma: PrismaService) {}
 
   async create(createUtilisateurDto: CreateUtilisateurDto) {
-    return this.prisma.utilisateur.create({
-      data: createUtilisateurDto,
+    const hashedPassword = await bcrypt.hash(
+      createUtilisateurDto.motDePasse,
+      SALT_ROUNDS,
+    );
+    const user = await this.prisma.utilisateur.create({
+      data: {
+        ...createUtilisateurDto,
+        motDePasse: hashedPassword,
+      },
     });
+    return this.sanitize(user);
   }
 
   async findAll() {
-    return this.prisma.utilisateur.findMany({
+    const users = await this.prisma.utilisateur.findMany({
       orderBy: { createdAt: 'desc' },
       include: {
         etablissement: {
@@ -22,6 +33,7 @@ export class UtilisateurService {
         },
       },
     });
+    return users.map((user) => this.sanitize(user));
   }
 
   async findOne(id: string) {
@@ -36,15 +48,20 @@ export class UtilisateurService {
     if (!utilisateur) {
       throw new NotFoundException(`Utilisateur avec ID ${id} non trouvé`);
     }
-    return utilisateur;
+    return this.sanitize(utilisateur);
   }
 
   async update(id: string, updateUtilisateurDto: UpdateUtilisateurDto) {
     await this.findOne(id);
-    return this.prisma.utilisateur.update({
+    const data = { ...updateUtilisateurDto };
+    if (data.motDePasse) {
+      data.motDePasse = await bcrypt.hash(data.motDePasse, SALT_ROUNDS);
+    }
+    const user = await this.prisma.utilisateur.update({
       where: { id },
-      data: updateUtilisateurDto,
+      data,
     });
+    return this.sanitize(user);
   }
 
   async remove(id: string) {
@@ -53,5 +70,10 @@ export class UtilisateurService {
       where: { id },
     });
   }
-}
 
+  private sanitize<T extends { motDePasse?: string }>(user: T) {
+    const safeUser = { ...user };
+    delete safeUser.motDePasse;
+    return safeUser;
+  }
+}

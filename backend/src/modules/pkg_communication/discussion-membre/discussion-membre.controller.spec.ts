@@ -18,7 +18,9 @@ describe('DiscussionMembreController', () => {
       ],
     }).compile();
 
-    controller = module.get<DiscussionMembreController>(DiscussionMembreController);
+    controller = module.get<DiscussionMembreController>(
+      DiscussionMembreController,
+    );
   });
 
   it('should be defined', () => {

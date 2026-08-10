@@ -36,7 +36,10 @@ export class ProfesseurMatiereService {
     return item;
   }
 
-  async update(id: string, updateProfesseurMatiereDto: UpdateProfesseurMatiereDto) {
+  async update(
+    id: string,
+    updateProfesseurMatiereDto: UpdateProfesseurMatiereDto,
+  ) {
     await this.findOne(id);
     return this.prisma.professeurMatiere.update({
       where: { id },

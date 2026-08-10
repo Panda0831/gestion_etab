@@ -31,12 +31,17 @@ export class TransactionFinanciereService {
       },
     });
     if (!item) {
-      throw new NotFoundException(`Transaction financière avec ID ${id} non trouvée`);
+      throw new NotFoundException(
+        `Transaction financière avec ID ${id} non trouvée`,
+      );
     }
     return item;
   }
 
-  async update(id: string, updateTransactionFinanciereDto: UpdateTransactionFinanciereDto) {
+  async update(
+    id: string,
+    updateTransactionFinanciereDto: UpdateTransactionFinanciereDto,
+  ) {
     await this.findOne(id);
     return this.prisma.transactionFinanciere.update({
       where: { id },

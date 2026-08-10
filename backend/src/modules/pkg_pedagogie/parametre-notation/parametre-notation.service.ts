@@ -29,12 +29,17 @@ export class ParametreNotationService {
       },
     });
     if (!item) {
-      throw new NotFoundException(`Paramètre de notation avec ID ${id} non trouvé`);
+      throw new NotFoundException(
+        `Paramètre de notation avec ID ${id} non trouvé`,
+      );
     }
     return item;
   }
 
-  async update(id: string, updateParametreNotationDto: UpdateParametreNotationDto) {
+  async update(
+    id: string,
+    updateParametreNotationDto: UpdateParametreNotationDto,
+  ) {
     await this.findOne(id);
     return this.prisma.parametreNotation.update({
       where: { id },

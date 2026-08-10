@@ -20,13 +20,17 @@ export class MatiereService {
       where: { id },
       include: { etablissement: true },
     });
-    if (!matiere) throw new NotFoundException(`Matière avec ID ${id} non trouvée`);
+    if (!matiere)
+      throw new NotFoundException(`Matière avec ID ${id} non trouvée`);
     return matiere;
   }
 
   async update(id: string, updateMatiereDto: UpdateMatiereDto) {
     await this.findOne(id);
-    return this.prisma.matiere.update({ where: { id }, data: updateMatiereDto });
+    return this.prisma.matiere.update({
+      where: { id },
+      data: updateMatiereDto,
+    });
   }
 
   async remove(id: string) {

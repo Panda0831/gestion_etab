@@ -20,17 +20,7 @@ import { PointageService } from './pointage/pointage.service';
     EleveController,
     PointageController,
   ],
-  providers: [
-    UtilisateurService,
-    ParentService,
-    EleveService,
-    PointageService,
-  ],
-  exports: [
-    UtilisateurService,
-    ParentService,
-    EleveService,
-    PointageService,
-  ],
+  providers: [UtilisateurService, ParentService, EleveService, PointageService],
+  exports: [UtilisateurService, ParentService, EleveService, PointageService],
 })
 export class PkgUtilisateursModule {}

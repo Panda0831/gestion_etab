@@ -16,7 +16,9 @@ describe('ClubEvenementMembreService', () => {
       ],
     }).compile();
 
-    service = module.get<ClubEvenementMembreService>(ClubEvenementMembreService);
+    service = module.get<ClubEvenementMembreService>(
+      ClubEvenementMembreService,
+    );
   });
 
   it('should be defined', () => {

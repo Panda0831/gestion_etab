@@ -18,7 +18,9 @@ describe('TransactionFinanciereController', () => {
       ],
     }).compile();
 
-    controller = module.get<TransactionFinanciereController>(TransactionFinanciereController);
+    controller = module.get<TransactionFinanciereController>(
+      TransactionFinanciereController,
+    );
   });
 
   it('should be defined', () => {

@@ -16,7 +16,9 @@ describe('TransactionFinanciereService', () => {
       ],
     }).compile();
 
-    service = module.get<TransactionFinanciereService>(TransactionFinanciereService);
+    service = module.get<TransactionFinanciereService>(
+      TransactionFinanciereService,
+    );
   });
 
   it('should be defined', () => {

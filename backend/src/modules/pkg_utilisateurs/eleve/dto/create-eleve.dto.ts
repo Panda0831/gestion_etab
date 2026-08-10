@@ -1,5 +1,12 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsDateString, IsEnum, IsNotEmpty, IsOptional, IsString, IsUUID } from 'class-validator';
+import {
+  IsDateString,
+  IsEnum,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  IsUUID,
+} from 'class-validator';
 import { Sexe, StatutInscription } from '@prisma/client';
 
 export class CreateEleveDto {
@@ -38,7 +45,10 @@ export class CreateEleveDto {
   @IsOptional()
   sexe?: Sexe;
 
-  @ApiPropertyOptional({ enum: StatutInscription, example: StatutInscription.INSCRIT })
+  @ApiPropertyOptional({
+    enum: StatutInscription,
+    example: StatutInscription.INSCRIT,
+  })
   @IsEnum(StatutInscription)
   @IsOptional()
   statutInscription?: StatutInscription;

@@ -18,7 +18,9 @@ describe('ParametreNotationController', () => {
       ],
     }).compile();
 
-    controller = module.get<ParametreNotationController>(ParametreNotationController);
+    controller = module.get<ParametreNotationController>(
+      ParametreNotationController,
+    );
   });
 
   it('should be defined', () => {

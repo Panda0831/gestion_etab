@@ -7,7 +7,9 @@ import { UpdateClubEvenementOrganisateurDto } from './dto/update-club-evenement-
 export class ClubEvenementOrganisateurService {
   constructor(private readonly prisma: PrismaService) {}
 
-  create(createClubEvenementOrganisateurDto: CreateClubEvenementOrganisateurDto) {
+  create(
+    createClubEvenementOrganisateurDto: CreateClubEvenementOrganisateurDto,
+  ) {
     return this.prisma.clubEvenementOrganisateur.create({
       data: createClubEvenementOrganisateurDto as any,
     });
@@ -31,12 +33,17 @@ export class ClubEvenementOrganisateurService {
       },
     });
     if (!item) {
-      throw new NotFoundException(`ClubEvenementOrganisateur avec ID ${id} non trouvé`);
+      throw new NotFoundException(
+        `ClubEvenementOrganisateur avec ID ${id} non trouvé`,
+      );
     }
     return item;
   }
 
-  async update(id: string, updateClubEvenementOrganisateurDto: UpdateClubEvenementOrganisateurDto) {
+  async update(
+    id: string,
+    updateClubEvenementOrganisateurDto: UpdateClubEvenementOrganisateurDto,
+  ) {
     await this.findOne(id);
     return this.prisma.clubEvenementOrganisateur.update({
       where: { id },

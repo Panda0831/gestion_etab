@@ -1,11 +1,21 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+} from '@nestjs/common';
 import { ClubEvenementMembreService } from './club-evenement-membre.service';
 import { CreateClubEvenementMembreDto } from './dto/create-club-evenement-membre.dto';
 import { UpdateClubEvenementMembreDto } from './dto/update-club-evenement-membre.dto';
 
 @Controller('club-evenement-membre')
 export class ClubEvenementMembreController {
-  constructor(private readonly clubEvenementMembreService: ClubEvenementMembreService) {}
+  constructor(
+    private readonly clubEvenementMembreService: ClubEvenementMembreService,
+  ) {}
 
   @Post()
   create(@Body() createClubEvenementMembreDto: CreateClubEvenementMembreDto) {
@@ -23,8 +33,14 @@ export class ClubEvenementMembreController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateClubEvenementMembreDto: UpdateClubEvenementMembreDto) {
-    return this.clubEvenementMembreService.update(id, updateClubEvenementMembreDto);
+  update(
+    @Param('id') id: string,
+    @Body() updateClubEvenementMembreDto: UpdateClubEvenementMembreDto,
+  ) {
+    return this.clubEvenementMembreService.update(
+      id,
+      updateClubEvenementMembreDto,
+    );
   }
 
   @Delete(':id')

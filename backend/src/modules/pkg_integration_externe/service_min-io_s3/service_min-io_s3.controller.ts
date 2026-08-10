@@ -1,4 +1,12 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+} from '@nestjs/common';
 import { ServiceMinIoS3Service } from './service_min-io_s3.service';
 import { CreateServiceMinIoS3Dto } from './dto/create-service_min-io_s3.dto';
 import { UpdateServiceMinIoS3Dto } from './dto/update-service_min-io_s3.dto';
@@ -23,7 +31,10 @@ export class ServiceMinIoS3Controller {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateServiceMinIoS3Dto: UpdateServiceMinIoS3Dto) {
+  update(
+    @Param('id') id: string,
+    @Body() updateServiceMinIoS3Dto: UpdateServiceMinIoS3Dto,
+  ) {
     return this.serviceMinIoS3Service.update(+id, updateServiceMinIoS3Dto);
   }
 

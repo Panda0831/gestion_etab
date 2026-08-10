@@ -1,8 +1,17 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsInt, IsNotEmpty, IsOptional, IsString, IsUUID } from 'class-validator';
+import {
+  IsInt,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  IsUUID,
+} from 'class-validator';
 
 export class CreateNiveauDto {
-  @ApiProperty({ example: 'uuid-etablissement', description: 'ID de l\'établissement' })
+  @ApiProperty({
+    example: 'uuid-etablissement',
+    description: "ID de l'établissement",
+  })
   @IsUUID()
   @IsNotEmpty()
   etablissementId: string;
@@ -22,4 +31,3 @@ export class CreateNiveauDto {
   @IsOptional()
   ordre?: number;
 }
-

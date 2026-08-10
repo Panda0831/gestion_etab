@@ -31,12 +31,17 @@ export class ClubEvenementMembreService {
       },
     });
     if (!item) {
-      throw new NotFoundException(`ClubEvenementMembre avec ID ${id} non trouvé`);
+      throw new NotFoundException(
+        `ClubEvenementMembre avec ID ${id} non trouvé`,
+      );
     }
     return item;
   }
 
-  async update(id: string, updateClubEvenementMembreDto: UpdateClubEvenementMembreDto) {
+  async update(
+    id: string,
+    updateClubEvenementMembreDto: UpdateClubEvenementMembreDto,
+  ) {
     await this.findOne(id);
     return this.prisma.clubEvenementMembre.update({
       where: { id },

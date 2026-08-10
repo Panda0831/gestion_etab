@@ -20,7 +20,8 @@ export class ClasseService {
       where: { id },
       include: { niveau: true },
     });
-    if (!classe) throw new NotFoundException(`Classe avec ID ${id} non trouvée`);
+    if (!classe)
+      throw new NotFoundException(`Classe avec ID ${id} non trouvée`);
     return classe;
   }
 

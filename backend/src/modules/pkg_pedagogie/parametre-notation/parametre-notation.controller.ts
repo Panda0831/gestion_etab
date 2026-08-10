@@ -1,11 +1,21 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+} from '@nestjs/common';
 import { ParametreNotationService } from './parametre-notation.service';
 import { CreateParametreNotationDto } from './dto/create-parametre-notation.dto';
 import { UpdateParametreNotationDto } from './dto/update-parametre-notation.dto';
 
 @Controller('parametre-notation')
 export class ParametreNotationController {
-  constructor(private readonly parametreNotationService: ParametreNotationService) {}
+  constructor(
+    private readonly parametreNotationService: ParametreNotationService,
+  ) {}
 
   @Post()
   create(@Body() createParametreNotationDto: CreateParametreNotationDto) {
@@ -23,7 +33,10 @@ export class ParametreNotationController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateParametreNotationDto: UpdateParametreNotationDto) {
+  update(
+    @Param('id') id: string,
+    @Body() updateParametreNotationDto: UpdateParametreNotationDto,
+  ) {
     return this.parametreNotationService.update(id, updateParametreNotationDto);
   }
 

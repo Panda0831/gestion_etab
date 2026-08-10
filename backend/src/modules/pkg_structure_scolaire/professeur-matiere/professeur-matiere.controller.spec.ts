@@ -18,7 +18,9 @@ describe('ProfesseurMatiereController', () => {
       ],
     }).compile();
 
-    controller = module.get<ProfesseurMatiereController>(ProfesseurMatiereController);
+    controller = module.get<ProfesseurMatiereController>(
+      ProfesseurMatiereController,
+    );
   });
 
   it('should be defined', () => {

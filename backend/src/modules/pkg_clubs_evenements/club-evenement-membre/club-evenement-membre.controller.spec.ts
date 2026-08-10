@@ -18,7 +18,9 @@ describe('ClubEvenementMembreController', () => {
       ],
     }).compile();
 
-    controller = module.get<ClubEvenementMembreController>(ClubEvenementMembreController);
+    controller = module.get<ClubEvenementMembreController>(
+      ClubEvenementMembreController,
+    );
   });
 
   it('should be defined', () => {

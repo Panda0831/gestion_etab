@@ -11,7 +11,9 @@ async function bootstrap() {
 
   const config = new DocumentBuilder()
     .setTitle('API Gestion Établissement')
-    .setDescription('Documentation de l\'API pour le système complet de gestion scolaire et d\'établissement')
+    .setDescription(
+      "Documentation de l'API pour le système complet de gestion scolaire et d'établissement",
+    )
     .setVersion('1.0')
     .addBearerAuth()
     .build();
@@ -20,8 +22,9 @@ async function bootstrap() {
 
   const port = process.env.PORT ?? 3000;
   await app.listen(port);
-  console.log(`🚀 Serveur en cours d'exécution sur http://localhost:${port}`);
-  console.log(`📚 Documentation Swagger disponible sur http://localhost:${port}/api`);
+  console.log(` Serveur en cours d'exécution sur http://localhost:${port}`);
+  console.log(
+    ` Documentation Swagger disponible sur http://localhost:${port}/api`,
+  );
 }
 bootstrap();
-

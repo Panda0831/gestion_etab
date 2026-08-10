@@ -1,4 +1,12 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+} from '@nestjs/common';
 import { ApiTags, ApiOperation } from '@nestjs/swagger';
 import { EtablissementService } from './etablissement.service';
 import { CreateEtablissementDto } from './dto/create-etablissement.dto';
@@ -29,7 +37,10 @@ export class EtablissementController {
 
   @Patch(':id')
   @ApiOperation({ summary: 'Mettre à jour un établissement' })
-  update(@Param('id') id: string, @Body() updateEtablissementDto: UpdateEtablissementDto) {
+  update(
+    @Param('id') id: string,
+    @Body() updateEtablissementDto: UpdateEtablissementDto,
+  ) {
     return this.etablissementService.update(id, updateEtablissementDto);
   }
 
@@ -39,4 +50,3 @@ export class EtablissementController {
     return this.etablissementService.remove(id);
   }
 }
-

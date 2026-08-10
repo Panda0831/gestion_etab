@@ -23,13 +23,17 @@ export class PointageService {
       where: { id },
       include: { professeur: true },
     });
-    if (!pointage) throw new NotFoundException(`Pointage avec ID ${id} non trouvé`);
+    if (!pointage)
+      throw new NotFoundException(`Pointage avec ID ${id} non trouvé`);
     return pointage;
   }
 
   async update(id: string, updatePointageDto: UpdatePointageDto) {
     await this.findOne(id);
-    return this.prisma.pointage.update({ where: { id }, data: updatePointageDto });
+    return this.prisma.pointage.update({
+      where: { id },
+      data: updatePointageDto,
+    });
   }
 
   async remove(id: string) {

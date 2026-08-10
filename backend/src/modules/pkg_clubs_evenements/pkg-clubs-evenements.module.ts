@@ -12,7 +12,6 @@ import { ClubEvenementMembreService } from './club-evenement-membre/club-eveneme
 import { ClubEvenementOrganisateurController } from './club-evenement-organisateur/club-evenement-organisateur.controller';
 import { ClubEvenementOrganisateurService } from './club-evenement-organisateur/club-evenement-organisateur.service';
 
-
 @Module({
   controllers: [
     ActiviteController,

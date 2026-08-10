@@ -1,4 +1,12 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+} from '@nestjs/common';
 import { ApiMvolaService } from './api_mvola.service';
 import { CreateApiMvolaDto } from './dto/create-api_mvola.dto';
 import { UpdateApiMvolaDto } from './dto/update-api_mvola.dto';
@@ -23,7 +31,10 @@ export class ApiMvolaController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateApiMvolaDto: UpdateApiMvolaDto) {
+  update(
+    @Param('id') id: string,
+    @Body() updateApiMvolaDto: UpdateApiMvolaDto,
+  ) {
     return this.apiMvolaService.update(+id, updateApiMvolaDto);
   }
 
