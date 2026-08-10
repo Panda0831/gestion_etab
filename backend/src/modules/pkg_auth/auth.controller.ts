@@ -25,6 +25,13 @@ export class AuthController {
     return this.authService.login(loginDto);
   }
 
+  @Public()
+  @Post('token')
+  @ApiOperation({ summary: 'Générer un token JWT (accès direct)' })
+  token(@Body() loginDto: LoginDto) {
+    return this.authService.issueToken(loginDto);
+  }
+
   @Get('profile')
   @ApiBearerAuth()
   @ApiOperation({ summary: "Récupérer le profil de l'utilisateur connecté" })

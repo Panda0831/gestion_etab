@@ -60,6 +60,26 @@ export class AuthService {
     return this.buildAuthResponse(user);
   }
 
+  async issueToken(loginDto: LoginDto) {
+    const user = await this.findByCredentials(loginDto);
+    if (!user) {
+      throw new UnauthorizedException('Email ou mot de passe invalide');
+    }
+    const payload = this.buildPayload(user);
+    const accessToken = await this.jwtService.signAsync(payload);
+    const decoded = await this.jwtService.verifyAsync<{ exp?: number }>(
+      accessToken,
+    );
+    const expiresIn = decoded.exp
+      ? decoded.exp - Math.floor(Date.now() / 1000)
+      : undefined;
+    return {
+      accessToken,
+      tokenType: 'Bearer',
+      expiresIn,
+    };
+  }
+
   async profile(userId: string) {
     const user = await this.prisma.utilisateur.findUnique({
       where: { id: userId },
@@ -108,15 +128,18 @@ export class AuthService {
     return user;
   }
 
-  private async buildAuthResponse(user: Utilisateur) {
-    const payload = {
+  private buildPayload(user: Utilisateur) {
+    return {
       sub: user.id,
       email: user.email,
       role: user.role,
       etablissementId: user.etablissementId,
     };
+  }
+
+  private async buildAuthResponse(user: Utilisateur) {
     return {
-      accessToken: await this.jwtService.signAsync(payload),
+      accessToken: await this.jwtService.signAsync(this.buildPayload(user)),
       utilisateur: this.sanitize(user),
     };
   }

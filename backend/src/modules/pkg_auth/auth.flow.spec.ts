@@ -17,6 +17,12 @@ interface AuthResponseBody {
   email?: string;
 }
 
+interface TokenResponseBody {
+  accessToken: string;
+  tokenType?: string;
+  expiresIn?: number;
+}
+
 const toBody = (res: { body: unknown }): AuthResponseBody =>
   res.body as AuthResponseBody;
 
@@ -86,6 +92,25 @@ describe('Auth (e2e)', () => {
   it('POST /auth/login -> 401 si mauvais mot de passe', async () => {
     await request(app.getHttpServer())
       .post('/auth/login')
+      .send({ email, motDePasse: 'mauvais-mdp' })
+      .expect(401);
+  });
+
+  it('POST /auth/token -> génère un accessToken', async () => {
+    const res = await request(app.getHttpServer())
+      .post('/auth/token')
+      .send({ email, motDePasse })
+      .expect(201);
+
+    const body = res.body as TokenResponseBody;
+    expect(body.accessToken).toBeDefined();
+    expect(body.tokenType).toBe('Bearer');
+    expect(typeof body.expiresIn).toBe('number');
+  });
+
+  it('POST /auth/token -> 401 si identifiants invalides', async () => {
+    await request(app.getHttpServer())
+      .post('/auth/token')
       .send({ email, motDePasse: 'mauvais-mdp' })
       .expect(401);
   });
