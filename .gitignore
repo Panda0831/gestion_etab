@@ -68,3 +68,4 @@ ehthumbs.db
 .vscode/
 *.swp
 *.swo
+.node_modules

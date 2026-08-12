@@ -5,14 +5,17 @@
   "main": "index.js",
   "private": true,
   "workspaces": [
-    "backend"
+    "backend",
+    "frontend"
   ],
   "scripts": {
     "prisma:generate": "prisma generate",
     "prisma:db:push": "prisma db push",
     "prisma:studio": "prisma studio",
     "docker:up": "docker compose up -d",
-    "docker:down": "docker compose down"
+    "docker:down": "docker compose down",
+    "frontend:dev": "cd frontend && npm run dev",
+    "frontend:build": "cd frontend && npm run build"
   },
   "keywords": [
     "school-management",
