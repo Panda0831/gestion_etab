@@ -9,12 +9,7 @@ function Login({ onLoginSuccess, onLogout, currentUser }) {
   const [showPassword, setShowPassword] = useState(false);
 
   // Etablissements list
-  const [etablissements, setEtablissements] = useState([
-    // Fallback Mock data for demo
-    { id: "1", nom: "Lycée de l'Excellence" },
-    { id: "2", nom: "École Primaire Horizon" },
-    { id: "3", nom: "Collège des Sciences" },
-  ]);
+  const [etablissements, setEtablissements] = useState([]);
 
   // Form Fields
   const [loginEmail, setLoginEmail] = useState("");
@@ -41,13 +36,11 @@ function Login({ onLoginSuccess, onLogout, currentUser }) {
       const res = await fetch(`${API_URL}/etablissement`);
       if (res.ok) {
         const data = await res.json();
-        if (data && data.length > 0) {
-          setEtablissements(data);
-        }
+        setEtablissements(data || []);
       }
     } catch (err) {
       console.log(
-        "Unable to connect to NestJS. Using fallback establishments.",
+        "Unable to connect to NestJS.",
         err,
       );
     }
@@ -81,28 +74,12 @@ function Login({ onLoginSuccess, onLogout, currentUser }) {
       }
 
       setSuccess("Connexion réussie !");
-      localStorage.setItem("token", data.access_token);
-      onLoginSuccess(data.access_token);
+      localStorage.setItem("token", data.accessToken);
+      onLoginSuccess(data.accessToken);
     } catch (err) {
       setError(
-        err.message || "Serveur injoignable. Simulation de connexion...",
+        err.message || "Serveur injoignable.",
       );
-      // Fallback for demonstration when NestJS is down
-      setTimeout(() => {
-        setError("");
-        setSuccess("Connexion simulée (Mode Démo)");
-        const mockUser = {
-          id: "demo-id",
-          email: loginEmail,
-          nom: "Dupont",
-          prenom: "Jean",
-          role: "DIRECTEUR",
-          etablissement:
-            etablissements.find((e) => e.id === loginEtablissement)?.nom ||
-            "Établissement Démo",
-        };
-        onLoginSuccess(null, mockUser);
-      }, 1000);
     } finally {
       setLoading(false);
     }
@@ -152,15 +129,8 @@ function Login({ onLoginSuccess, onLogout, currentUser }) {
       setLoginEmail(regEmail);
     } catch (err) {
       setError(
-        err.message || "Serveur injoignable. Simulation d'inscription...",
+        err.message || "Serveur injoignable.",
       );
-      // Fallback for demonstration when NestJS is down
-      setTimeout(() => {
-        setError("");
-        setSuccess("Inscription simulée (Mode Démo) !");
-        setIsRegister(false);
-        setLoginEmail(regEmail);
-      }, 1000);
     } finally {
       setLoading(false);
     }
@@ -294,7 +264,9 @@ function Login({ onLoginSuccess, onLogout, currentUser }) {
                 <div className="detail-row">
                   <span className="detail-label">Établissement</span>
                   <span className="detail-value">
-                    {currentUser.etablissement}
+                    {typeof currentUser.etablissement === "object"
+                      ? currentUser.etablissement.nom
+                      : currentUser.etablissement}
                   </span>
                 </div>
               )}

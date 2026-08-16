@@ -46,11 +46,32 @@ function App() {
 
   return (
     <div className="app-container">
-      <Login 
-        onLoginSuccess={handleLoginSuccess} 
-        onLogout={handleLogout} 
-        currentUser={user} 
-      />
+      {user ? (
+        <div className="home-page" style={{ padding: '2rem', textAlign: 'center' }}>
+          <h1>Accueil</h1>
+          <button 
+            onClick={handleLogout} 
+            style={{
+              marginTop: '1.5rem',
+              padding: '0.75rem 1.5rem',
+              backgroundColor: '#e11d48',
+              color: 'white',
+              border: 'none',
+              borderRadius: '0.375rem',
+              cursor: 'pointer',
+              fontWeight: '500'
+            }}
+          >
+            Se déconnecter
+          </button>
+        </div>
+      ) : (
+        <Login 
+          onLoginSuccess={handleLoginSuccess} 
+          onLogout={handleLogout} 
+          currentUser={user} 
+        />
+      )}
     </div>
   );
 }

@@ -12,6 +12,8 @@ import { EtablissementService } from './etablissement.service';
 import { CreateEtablissementDto } from './dto/create-etablissement.dto';
 import { UpdateEtablissementDto } from './dto/update-etablissement.dto';
 
+import { Public } from '../../pkg_auth/decorators/public.decorator';
+
 @ApiTags('Établissements')
 @Controller('etablissement')
 export class EtablissementController {
@@ -23,6 +25,7 @@ export class EtablissementController {
     return this.etablissementService.create(createEtablissementDto);
   }
 
+  @Public()
   @Get()
   @ApiOperation({ summary: 'Récupérer la liste de tous les établissements' })
   findAll() {
