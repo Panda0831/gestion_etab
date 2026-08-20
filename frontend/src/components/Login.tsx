@@ -1,218 +1,32 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useAuth } from "../hooks/useAuth";
+import { FadeIn } from "./ui/Motion";
+import AnimatedInput from "./ui/AnimatedInput";
+import AnimatedSelect from "./ui/AnimatedSelect";
+import AlertBanner from "./ui/AlertBanner";
+import FloatingParticle, { particles } from "./ui/FloatingParticle";
+import { MailIcon, LockIcon, PhoneIcon, UserIcon, EyeIcon, EyeOffIcon, CalendarIcon } from "./icons";
+import { Role, User } from "../types/auth";
 
-/* ───────────────────── tiny reusable wrappers ───────────────────── */
+interface Feature {
+  title: string;
+  desc: string;
+  icon: React.ReactNode;
+}
 
-const FadeIn = ({ children, delay = 0, className, style }) => (
-  <motion.div
-    initial={{ opacity: 0, y: 18 }}
-    animate={{ opacity: 1, y: 0 }}
-    transition={{ duration: 0.45, delay, ease: [0.22, 1, 0.36, 1] }}
-    className={className}
-    style={style}
-  >
-    {children}
-  </motion.div>
-);
+interface LoginProps {
+  onLoginSuccess: (token: string) => void;
+  onLogout: () => void;
+  currentUser: User | null;
+}
 
-const ScaleIn = ({ children, delay = 0, className, style }) => (
-  <motion.div
-    initial={{ opacity: 0, scale: 0.85 }}
-    animate={{ opacity: 1, scale: 1 }}
-    transition={{ duration: 0.5, delay, ease: [0.22, 1, 0.36, 1] }}
-    className={className}
-    style={style}
-  >
-    {children}
-  </motion.div>
-);
-
-/* ───────────────────── floating background particles ────────────── */
-
-const FloatingParticle = ({ delay, x, y, size, duration }) => (
-  <motion.div
-    style={{
-      position: "absolute",
-      left: `${x}%`,
-      top: `${y}%`,
-      width: size,
-      height: size,
-      borderRadius: "50%",
-      background: "rgba(255,255,255,0.06)",
-      pointerEvents: "none",
-    }}
-    animate={{
-      y: [0, -30, 0],
-      x: [0, 15, 0],
-      scale: [1, 1.3, 1],
-      opacity: [0.3, 0.7, 0.3],
-    }}
-    transition={{
-      duration,
-      delay,
-      repeat: Infinity,
-      ease: "easeInOut",
-    }}
-  />
-);
-
-const particles = [
-  { delay: 0, x: 15, y: 20, size: 80, duration: 8 },
-  { delay: 1.5, x: 70, y: 60, size: 120, duration: 10 },
-  { delay: 0.8, x: 40, y: 80, size: 60, duration: 7 },
-  { delay: 2, x: 85, y: 15, size: 90, duration: 9 },
-  { delay: 0.3, x: 55, y: 40, size: 50, duration: 6 },
-  { delay: 1.2, x: 25, y: 55, size: 70, duration: 11 },
-];
-
-/* ───────────────────── icon components ─────────────────────────── */
-
-const MailIcon = () => (
-  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <rect width="20" height="16" x="2" y="4" rx="2" />
-    <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
-  </svg>
-);
-
-const LockIcon = () => (
-  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <rect width="18" height="11" x="3" y="11" rx="2" ry="2" />
-    <path d="M7 11V7a5 5 0 0 1 10 0v4" />
-  </svg>
-);
-
-const HomeIcon = () => (
-  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
-    <polyline points="9 22 9 12 15 12 15 22" />
-  </svg>
-);
-
-const PhoneIcon = () => (
-  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" />
-  </svg>
-);
-
-const UserIcon = ({ size = 18 }) => (
-  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" />
-    <circle cx="12" cy="7" r="4" />
-  </svg>
-);
-
-const EyeIcon = () => (
-  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z" />
-    <circle cx="12" cy="12" r="3" />
-  </svg>
-);
-
-const EyeOffIcon = () => (
-  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M9.88 9.88a3 3 0 1 0 4.24 4.24" />
-    <path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68" />
-    <path d="M6.61 6.61A13.52 13.52 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61" />
-    <line x1="2" y1="2" x2="22" y2="22" />
-  </svg>
-);
-
-const AlertCircleIcon = () => (
-  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <circle cx="12" cy="12" r="10" />
-    <line x1="12" y1="8" x2="12" y2="12" />
-    <line x1="12" y1="16" x2="12.01" y2="16" />
-  </svg>
-);
-
-const CheckCircleIcon = () => (
-  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
-    <polyline points="22 4 12 14.01 9 11.01" />
-  </svg>
-);
-
-/* ───────────────────── Animated Input ──────────────────────────── */
-
-const AnimatedInput = ({
-  id, type = "text", placeholder, value, onChange, required,
-  icon, rightElement, delay = 0, style,
-}) => (
-  <motion.div
-    className="form-group"
-    initial={{ opacity: 0, x: -12 }}
-    animate={{ opacity: 1, x: 0 }}
-    transition={{ duration: 0.35, delay, ease: [0.22, 1, 0.36, 1] }}
-  >
-    <label className="form-label" htmlFor={id}>{placeholder}</label>
-    <motion.div
-      className="input-wrapper"
-      whileFocus={{ scale: 1.01 }}
-    >
-      {icon && <span className="input-icon-left">{icon}</span>}
-      <motion.input
-        id={id}
-        type={type}
-        className="input-control"
-        placeholder={placeholder}
-        value={value}
-        onChange={onChange}
-        required={required}
-        style={style}
-        whileFocus={{
-          boxShadow: "0 0 0 4px rgba(37, 99, 235, 0.2), 0 4px 12px rgba(37, 99, 235, 0.1)",
-        }}
-        transition={{ duration: 0.2 }}
-      />
-      {rightElement}
-    </motion.div>
-  </motion.div>
-);
-
-/* ───────────────────── Animated Select ─────────────────────────── */
-
-const AnimatedSelect = ({
-  id, value, onChange, required, children, delay = 0, label, optional, style,
-}) => (
-  <motion.div
-    className="form-group"
-    initial={{ opacity: 0, x: -12 }}
-    animate={{ opacity: 1, x: 0 }}
-    transition={{ duration: 0.35, delay, ease: [0.22, 1, 0.36, 1] }}
-  >
-    <label className="form-label" htmlFor={id}>
-      {label}
-      {optional && <span className="form-label-optional">(Optionnel)</span>}
-    </label>
-    <div className="input-wrapper">
-      <motion.select
-        id={id}
-        className="input-control select-control"
-        value={value}
-        onChange={onChange}
-        required={required}
-        style={style}
-        whileFocus={{
-          boxShadow: "0 0 0 4px rgba(37, 99, 235, 0.2)",
-        }}
-        transition={{ duration: 0.2 }}
-      >
-        {children}
-      </motion.select>
-    </div>
-  </motion.div>
-);
-
-/* ═══════════════════════ MAIN COMPONENT ═══════════════════════════ */
-
-function Login({ onLoginSuccess, onLogout, currentUser }) {
+function Login({ onLoginSuccess, onLogout, currentUser }: LoginProps) {
   const [isRegister, setIsRegister] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
   const [showPassword, setShowPassword] = useState(false);
 
-  const [etablissements, setEtablissements] = useState([]);
+  const { loading, error, success, etablissements, login, register, setError, setSuccess } =
+    useAuth(onLoginSuccess);
 
   // Login fields
   const [loginEmail, setLoginEmail] = useState("");
@@ -225,91 +39,48 @@ function Login({ onLoginSuccess, onLogout, currentUser }) {
   const [regNom, setRegNom] = useState("");
   const [regPrenom, setRegPrenom] = useState("");
   const [regTelephone, setRegTelephone] = useState("");
-  const [regRole, setRegRole] = useState("PROFESSEUR");
+  const [regRole, setRegRole] = useState<Role>("PROFESSEUR");
   const [regEtablissement, setRegEtablissement] = useState("");
 
-  const API_URL = "http://localhost:3000";
-
-  useEffect(() => {
-    fetchEtablissements();
-  }, []);
-
-  const fetchEtablissements = async () => {
-    try {
-      const res = await fetch(`${API_URL}/etablissement`);
-      if (res.ok) {
-        const data = await res.json();
-        setEtablissements(data || []);
-      }
-    } catch (err) {
-      console.log("Unable to connect to NestJS.", err);
-    }
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    await login({
+      email: loginEmail,
+      password: loginPassword,
+      etablissementId: loginEtablissement,
+    });
   };
 
-  const handleLogin = async (e) => {
+  const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError("");
-    setSuccess("");
-    setLoading(true);
-    try {
-      const payload = { email: loginEmail, motDePasse: loginPassword };
-      if (loginEtablissement) payload.etablissementId = loginEtablissement;
-      const res = await fetch(`${API_URL}/auth/login`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.message || "Échec de la connexion");
-      setSuccess("Connexion réussie !");
-      localStorage.setItem("token", data.accessToken);
-      onLoginSuccess(data.accessToken);
-    } catch (err) {
-      setError(err.message || "Serveur injoignable.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleRegister = async (e) => {
-    e.preventDefault();
-    setError("");
-    setSuccess("");
-    setLoading(true);
-    if (!regEtablissement) {
-      setError("Veuillez sélectionner un établissement");
-      setLoading(false);
-      return;
-    }
-    try {
-      const payload = {
-        email: regEmail,
-        motDePasse: regPassword,
-        nom: regNom,
-        prenom: regPrenom,
-        role: regRole,
-        etablissementId: regEtablissement,
-      };
-      if (regTelephone) payload.telephone = regTelephone;
-      const res = await fetch(`${API_URL}/auth/register`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.message || "Échec de l'inscription");
-      setSuccess("Inscription réussie ! Vous pouvez maintenant vous connecter.");
+    const ok = await register({
+      email: regEmail,
+      password: regPassword,
+      nom: regNom,
+      prenom: regPrenom,
+      telephone: regTelephone,
+      role: regRole,
+      etablissementId: regEtablissement,
+    });
+    if (ok) {
       setIsRegister(false);
       setLoginEmail(regEmail);
-    } catch (err) {
-      setError(err.message || "Serveur injoignable.");
-    } finally {
-      setLoading(false);
     }
   };
 
-  /* ─── Left panel feature items ─── */
-  const features = [
+  const switchToRegister = () => {
+    setIsRegister(true);
+    setError("");
+    setSuccess("");
+  };
+
+  const switchToLogin = () => {
+    setIsRegister(false);
+    setError("");
+    setSuccess("");
+  };
+
+  const features: Feature[] = [
     {
       title: "Espace Multi-Rôles",
       desc: "Accès dédié pour Directeurs, Professeurs, Secrétaires, Parents et Élèves.",
@@ -318,32 +89,9 @@ function Login({ onLoginSuccess, onLogout, currentUser }) {
     {
       title: "Suivi du Calendrier",
       desc: "Gestion en temps réel des emplois du temps et des événements.",
-      icon: (
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
-          <line x1="16" y1="2" x2="16" y2="6" />
-          <line x1="8" y1="2" x2="8" y2="6" />
-          <line x1="3" y1="10" x2="21" y2="10" />
-        </svg>
-      ),
+      icon: <CalendarIcon />,
     },
   ];
-
-  /* ─── Alert banner (animated) ─── */
-  const AlertBanner = ({ type, message }) => (
-    <AnimatePresence>
-      <motion.div
-        className={`alert alert-${type}`}
-        initial={{ opacity: 0, y: -10, height: 0, marginBottom: 0 }}
-        animate={{ opacity: 1, y: 0, height: "auto", marginBottom: 24 }}
-        exit={{ opacity: 0, y: -10, height: 0, marginBottom: 0 }}
-        transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
-      >
-        {type === "error" ? <AlertCircleIcon /> : <CheckCircleIcon />}
-        <span>{message}</span>
-      </motion.div>
-    </AnimatePresence>
-  );
 
   return (
     <motion.div
@@ -354,7 +102,6 @@ function Login({ onLoginSuccess, onLogout, currentUser }) {
     >
       {/* ═══════ LEFT PANEL – Branding ═══════ */}
       <div className="portal-info-panel">
-        {/* Floating particles */}
         {particles.map((p, i) => (
           <FloatingParticle key={i} {...p} />
         ))}
@@ -415,7 +162,6 @@ function Login({ onLoginSuccess, onLogout, currentUser }) {
       <div className="portal-form-panel">
         <AnimatePresence mode="wait">
           {currentUser ? (
-            /* ──── Connected Profile ──── */
             <motion.div
               key="profile"
               className="profile-card"
@@ -433,9 +179,7 @@ function Login({ onLoginSuccess, onLogout, currentUser }) {
                 <UserIcon size={40} />
               </motion.div>
               <FadeIn delay={0.15}>
-                <h3 className="profile-name">
-                  {currentUser.prenom} {currentUser.nom}
-                </h3>
+                <h3 className="profile-name">{currentUser.prenom} {currentUser.nom}</h3>
               </FadeIn>
               <FadeIn delay={0.2}>
                 <motion.span
@@ -447,7 +191,6 @@ function Login({ onLoginSuccess, onLogout, currentUser }) {
                   {currentUser.role}
                 </motion.span>
               </FadeIn>
-
               <FadeIn delay={0.3}>
                 <div className="profile-details">
                   <div className="detail-row">
@@ -474,7 +217,6 @@ function Login({ onLoginSuccess, onLogout, currentUser }) {
                   )}
                 </div>
               </FadeIn>
-
               <FadeIn delay={0.4}>
                 <motion.button
                   className="btn-secondary"
@@ -487,7 +229,6 @@ function Login({ onLoginSuccess, onLogout, currentUser }) {
               </FadeIn>
             </motion.div>
           ) : !isRegister ? (
-            /* ──── Login Form ──── */
             <motion.div
               key="login"
               initial={{ opacity: 0, x: 30 }}
@@ -502,7 +243,7 @@ function Login({ onLoginSuccess, onLogout, currentUser }) {
                     Pas encore de compte ?{" "}
                     <motion.span
                       className="form-toggle-link"
-                      onClick={() => { setIsRegister(true); setError(""); setSuccess(""); }}
+                      onClick={switchToRegister}
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
                     >
@@ -598,7 +339,6 @@ function Login({ onLoginSuccess, onLogout, currentUser }) {
               </form>
             </motion.div>
           ) : (
-            /* ──── Register Form ──── */
             <motion.div
               key="register"
               initial={{ opacity: 0, x: 30 }}
@@ -613,7 +353,7 @@ function Login({ onLoginSuccess, onLogout, currentUser }) {
                     Déjà inscrit ?{" "}
                     <motion.span
                       className="form-toggle-link"
-                      onClick={() => { setIsRegister(false); setError(""); setSuccess(""); }}
+                      onClick={switchToLogin}
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
                     >
@@ -675,7 +415,7 @@ function Login({ onLoginSuccess, onLogout, currentUser }) {
                   <AnimatedSelect
                     id="reg-role"
                     value={regRole}
-                    onChange={(e) => setRegRole(e.target.value)}
+                    onChange={(e) => setRegRole(e.target.value as Role)}
                     required
                     delay={0.3}
                     label="Rôle"
