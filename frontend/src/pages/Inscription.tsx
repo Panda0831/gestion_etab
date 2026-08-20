@@ -1,410 +1,411 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useNavigate } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
 import { FadeIn } from "../components/ui/Motion";
 import AnimatedInput from "../components/ui/AnimatedInput";
 import AnimatedSelect from "../components/ui/AnimatedSelect";
 import AlertBanner from "../components/ui/AlertBanner";
-import { MailIcon, LockIcon, PhoneIcon, UserIcon, EyeIcon, EyeOffIcon, CalendarIcon } from "../components/icons";
-import { Role, User } from "../types/auth";
+import {
+  MailIcon,
+  UserIcon,
+  PhoneIcon,
+  BriefcaseIcon,
+  CalendarIcon,
+  MapPinIcon,
+  UsersIcon,
+} from "../components/icons"; // adaptez le chemin
+import { post } from "../services/api";
+import { RegisterPayload, User, ParentPayload, ElevePayload } from "../types/auth";
 
-interface LoginProps {
-  onLoginSuccess: (token: string) => void;
-  onLogout: () => void;
-  currentUser: User | null;
-}
+function Inscription() {
+  const navigate = useNavigate();
+  const { loading, error, success, etablissements, login, setError, setSuccess } = useAuth(() => {});
 
-function Login({ onLoginSuccess, onLogout, currentUser }: LoginProps) {
-  const [isRegister, setIsRegister] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
+  const [step, setStep] = useState<"parent" | "eleve">("parent");
+  const [parentUserId, setParentUserId] = useState<string | null>(null);
+  const [parentId, setParentId] = useState<string | null>(null);
+  const [etablissementId, setEtablissementId] = useState("");
 
-  const { loading, error, success, etablissements, login, register, setError, setSuccess } =
-    useAuth(onLoginSuccess);
+  // Champs parent (utilisateur)
+  const [nom, setNom] = useState("");
+  const [prenom, setPrenom] = useState("");
+  const [email, setEmail] = useState("");
+  const [telephone, setTelephone] = useState("");
+  const [profession, setProfession] = useState("");
+  const [parentLoading, setParentLoading] = useState(false);
+  const [parentError, setParentError] = useState("");
 
-  // Login fields
-  const [loginEmail, setLoginEmail] = useState("");
-  const [loginPassword, setLoginPassword] = useState("");
-  const [loginEtablissement, setLoginEtablissement] = useState("");
+  // Champs élève (utilisateur + entité)
+  const [eleveNom, setEleveNom] = useState("");
+  const [elevePrenom, setElevePrenom] = useState("");
+  const [eleveEmail, setEleveEmail] = useState("");
+  const [eleveTelephone, setEleveTelephone] = useState("");
+  const [dateNaissance, setDateNaissance] = useState("");
+  const [lieuNaissance, setLieuNaissance] = useState("");
+  const [sexe, setSexe] = useState<"M" | "F">("M");
+  const [classe, setClasse] = useState("");
+  const [eleveLoading, setEleveLoading] = useState(false);
+  const [eleveError, setEleveError] = useState("");
 
-  // Register fields
-  const [regEmail, setRegEmail] = useState("");
-  const [regPassword, setRegPassword] = useState("");
-  const [regNom, setRegNom] = useState("");
-  const [regPrenom, setRegPrenom] = useState("");
-  const [regTelephone, setRegTelephone] = useState("");
-  const [regRole, setRegRole] = useState<Role>("PROFESSEUR");
-  const [regEtablissement, setRegEtablissement] = useState("");
-
-  const handleLogin = async (e: React.FormEvent) => {
+  // Étape 1 : création du parent (utilisateur + entité parent)
+  const handleSubmitParent = async (e: React.FormEvent) => {
     e.preventDefault();
-    await login({
-      email: loginEmail,
-      password: loginPassword,
-      etablissementId: loginEtablissement,
-    });
-  };
+    if (!etablissementId) {
+      setParentError("Veuillez sélectionner un établissement");
+      return;
+    }
 
-  const handleRegister = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const ok = await register({
-      email: regEmail,
-      password: regPassword,
-      nom: regNom,
-      prenom: regPrenom,
-      telephone: regTelephone,
-      role: regRole,
-      etablissementId: regEtablissement,
-    });
-    if (ok) {
-      setIsRegister(false);
-      setLoginEmail(regEmail);
+    setParentError("");
+    setParentLoading(true);
+    try {
+      // Générer un mot de passe temporaire (ou utiliser un champ input)
+      const generatedPassword = crypto.randomUUID();
+
+      // 1. Créer l'utilisateur parent via la route publique /auth/register
+      const registerPayload: RegisterPayload = {
+        email,
+        password: generatedPassword,
+        motDePasse: generatedPassword,
+        nom,
+        prenom,
+        telephone,
+        role: "PARENT",
+        etablissementId,
+      };
+      const createdUser = await post<RegisterPayload, User>("/auth/register", registerPayload, false);
+      setParentUserId(createdUser.id);
+      console.log("Utilisateur parent créé:", createdUser);
+
+
+      // 3. Créer l'entité parent (table parent) avec token
+      const createdParent = await post<ParentPayload, { id: string }>(
+        "/parent",
+        {
+          utilisateurId: createdUser.id,
+          profession,
+        },
+        true // route protégée
+      );
+      setParentId(createdParent.id);
+      console.log("Entité parent créée:", createdParent);
+
+      // Passer à l'étape élève
+      setStep("eleve");
+    } catch (err) {
+      setParentError(err instanceof Error ? err.message : "Serveur injoignable.");
+    } finally {
+      setParentLoading(false);
     }
   };
 
-  const switchToRegister = () => {
-    setIsRegister(true);
-    setError("");
-    setSuccess("");
-  };
+  // Étape 2 : création de l'élève (utilisateur + entité élève)
+  const handleSubmitEleve = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!parentId || !etablissementId) {
+      setEleveError("Informations parent ou établissement manquantes");
+      return;
+    }
 
-  const switchToLogin = () => {
-    setIsRegister(false);
-    setError("");
-    setSuccess("");
+    setEleveError("");
+    setEleveLoading(true);
+    try {
+      // 1. Créer l'utilisateur élève (route protégée)
+      const createdEleveUser = await post<RegisterPayload, User>(
+        "/utilisateur",
+        {
+          email: eleveEmail,
+          nom: eleveNom,
+          prenom: elevePrenom,
+          telephone: eleveTelephone || undefined,
+          role: "ELEVE",
+          etablissementId,
+        },
+        true
+      );
+
+      // 2. Créer l'entité élève avec le payload exact attendu
+      const elevePayload: ElevePayload = {
+        utilisateurId: createdEleveUser.id,
+        classeId: classe,
+        parentId: parentId,
+        dateNaissance,
+        lieuNaissance,
+        sexe,
+        // matricule et statutInscription optionnels (backend les génère)
+      };
+      await post<ElevePayload, any>("/eleve", elevePayload, true);
+
+      // Tout est réussi, rediriger vers la page de connexion
+      navigate("/");
+    } catch (err) {
+      setEleveError(err instanceof Error ? err.message : "Serveur injoignable.");
+    } finally {
+      setEleveLoading(false);
+    }
   };
 
   return (
     <motion.div
-      className="portal-card"
+      className="portal-container"
+      style={{ maxWidth: "500px", margin: "0 auto", padding: "2rem" }}
       initial={{ opacity: 0, scale: 0.95 }}
       animate={{ opacity: 1, scale: 1 }}
       transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
     >
+      <FadeIn delay={0.05}>
+        <div className="form-header">
+          <h3>Inscription Élève</h3>
+          <p>
+            {step === "parent"
+              ? "Renseignez d'abord les informations du parent."
+              : "Renseignez maintenant les informations de l'élève."}
+          </p>
+        </div>
+      </FadeIn>
 
-      {/* ═══════ RIGHT PANEL – Form ═══════ */}
-      <div className="portal-form-panel">
-        <AnimatePresence mode="wait">
-          {currentUser ? (
-            <motion.div
-              key="profile"
-              className="profile-card"
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.9 }}
-              transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-            >
-              <motion.div
-                className="profile-avatar"
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                transition={{ type: "spring", stiffness: 200, damping: 15, delay: 0.1 }}
-              >
-                <UserIcon size={40} />
-              </motion.div>
-              <FadeIn delay={0.15}>
-                <h3 className="profile-name">{currentUser.prenom} {currentUser.nom}</h3>
-              </FadeIn>
-              <FadeIn delay={0.2}>
-                <motion.span
-                  className="profile-role"
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  transition={{ type: "spring", delay: 0.25 }}
-                >
-                  {currentUser.role}
-                </motion.span>
-              </FadeIn>
-              <FadeIn delay={0.3}>
-                <div className="profile-details">
-                  <div className="detail-row">
-                    <span className="detail-label">Email</span>
-                    <span className="detail-value">{currentUser.email}</span>
-                  </div>
-                  {currentUser.etablissement && (
-                    <div className="detail-row">
-                      <span className="detail-label">Établissement</span>
-                      <span className="detail-value">
-                        {typeof currentUser.etablissement === "object"
-                          ? currentUser.etablissement.nom
-                          : currentUser.etablissement}
-                      </span>
-                    </div>
-                  )}
-                  {currentUser.id && (
-                    <div className="detail-row">
-                      <span className="detail-label">Identifiant</span>
-                      <span className="detail-value" style={{ fontSize: "12px", fontFamily: "monospace" }}>
-                        {currentUser.id}
-                      </span>
-                    </div>
-                  )}
+      <AnimatePresence mode="wait">
+        {step === "parent" ? (
+          <motion.div
+            key="parent-step"
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -20 }}
+            transition={{ duration: 0.3 }}
+          >
+            {error && <AlertBanner type="error" message={error} />}
+            {success && <AlertBanner type="success" message={success} />}
+            {parentError && <AlertBanner type="error" message={parentError} />}
+
+            <form onSubmit={handleSubmitParent}>
+              <FadeIn delay={0.05}>
+                <div className="form-header">
+                  <h4>Informations Parent</h4>
                 </div>
               </FadeIn>
-              <FadeIn delay={0.4}>
+
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px" }}>
+                <AnimatedInput
+                  id="reg-prenom"
+                  placeholder="Prénom"
+                  value={prenom}
+                  onChange={(e) => setPrenom(e.target.value)}
+                  required
+                  icon={<UserIcon />}
+                  delay={0.1}
+                  style={{ paddingLeft: "36px" }}
+                />
+                <AnimatedInput
+                  id="reg-nom"
+                  placeholder="Nom"
+                  value={nom}
+                  onChange={(e) => setNom(e.target.value)}
+                  required
+                  icon={<UserIcon />}
+                  delay={0.15}
+                  style={{ paddingLeft: "36px" }}
+                />
+              </div>
+
+              <AnimatedInput
+                id="reg-email"
+                type="email"
+                placeholder="Adresse Email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                icon={<MailIcon />}
+                delay={0.2}
+              />
+
+              <AnimatedInput
+                id="reg-tel"
+                type="tel"
+                placeholder="Téléphone"
+                value={telephone}
+                onChange={(e) => setTelephone(e.target.value)}
+                icon={<PhoneIcon />}
+                delay={0.25}
+              />
+
+              <AnimatedInput
+                id="reg-profession"
+                type="text"
+                placeholder="Profession"
+                value={profession}
+                onChange={(e) => setProfession(e.target.value)}
+                icon={<BriefcaseIcon />}
+                delay={0.25}
+              />
+
+              <AnimatedSelect
+                id="reg-etablissement"
+                value={etablissementId}
+                onChange={(e) => setEtablissementId(e.target.value)}
+                required
+                delay={0.3}
+                label="Établissement"
+              >
+                <option value="">Sélectionnez...</option>
+                {etablissements.map((etab) => (
+                  <option key={etab.id} value={etab.id}>
+                    {etab.nom}
+                  </option>
+                ))}
+              </AnimatedSelect>
+
+              <FadeIn delay={0.35}>
                 <motion.button
-                  className="btn-secondary"
-                  onClick={onLogout}
-                  whileHover={{ scale: 1.02, backgroundColor: "#e2e8f0" }}
-                  whileTap={{ scale: 0.98 }}
+                  type="submit"
+                  className="btn-submit"
+                  disabled={parentLoading}
+                  whileHover={!parentLoading ? { scale: 1.02, boxShadow: "0 8px 24px rgba(37,99,235,0.3)" } : {}}
+                  whileTap={!parentLoading ? { scale: 0.98 } : {}}
+                  transition={{ type: "spring", stiffness: 400, damping: 20 }}
                 >
-                  Se déconnecter
+                  {parentLoading ? (
+                    <motion.span
+                      className="spinner"
+                      animate={{ rotate: 360 }}
+                      transition={{ duration: 0.8, repeat: Infinity, ease: "linear" }}
+                    />
+                  ) : (
+                    "Suivant"
+                  )}
                 </motion.button>
               </FadeIn>
-            </motion.div>
-          ) : !isRegister ? (
-            <motion.div
-              key="login"
-              initial={{ opacity: 0, x: 30 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -30 }}
-              transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-            >
+            </form>
+          </motion.div>
+        ) : (
+          <motion.div
+            key="eleve-step"
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -20 }}
+            transition={{ duration: 0.3 }}
+          >
+            {eleveError && <AlertBanner type="error" message={eleveError} />}
+
+            <form onSubmit={handleSubmitEleve}>
               <FadeIn delay={0.05}>
                 <div className="form-header">
-                  <h3>Espace de Connexion</h3>
-                  <p>
-                    Pas encore de compte ?{" "}
-                    <motion.span
-                      className="form-toggle-link"
-                      onClick={switchToRegister}
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
-                    >
-                      Créer un compte
-                    </motion.span>
-                  </p>
+                  <h4>Informations Élève</h4>
                 </div>
               </FadeIn>
 
-              {error && <AlertBanner type="error" message={error} />}
-              {success && <AlertBanner type="success" message={success} />}
-
-              <form onSubmit={handleLogin}>
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px" }}>
                 <AnimatedInput
-                  id="login-email"
-                  type="email"
-                  placeholder="Adresse Email"
-                  value={loginEmail}
-                  onChange={(e) => setLoginEmail(e.target.value)}
+                  id="eleve-prenom"
+                  placeholder="Prénom"
+                  value={elevePrenom}
+                  onChange={(e) => setElevePrenom(e.target.value)}
                   required
-                  icon={<MailIcon />}
+                  icon={<UserIcon />}
                   delay={0.1}
+                  style={{ paddingLeft: "36px" }}
                 />
-
                 <AnimatedInput
-                  id="login-password"
-                  type={showPassword ? "text" : "password"}
-                  placeholder="Mot de passe"
-                  value={loginPassword}
-                  onChange={(e) => setLoginPassword(e.target.value)}
+                  id="eleve-nom"
+                  placeholder="Nom"
+                  value={eleveNom}
+                  onChange={(e) => setEleveNom(e.target.value)}
                   required
-                  icon={<LockIcon />}
+                  icon={<UserIcon />}
                   delay={0.15}
-                  rightElement={
-                    <motion.button
-                      type="button"
-                      className="input-toggle-password"
-                      onClick={() => setShowPassword(!showPassword)}
-                      whileHover={{ scale: 1.15 }}
-                      whileTap={{ scale: 0.9 }}
-                    >
-                      {showPassword ? <EyeOffIcon /> : <EyeIcon />}
-                    </motion.button>
-                  }
+                  style={{ paddingLeft: "36px" }}
                 />
+              </div>
 
-                <AnimatedSelect
-                  id="login-etablissement"
-                  value={loginEtablissement}
-                  onChange={(e) => setLoginEtablissement(e.target.value)}
-                  delay={0.2}
-                  label="Établissement"
-                  optional
+              <AnimatedInput
+                id="eleve-email"
+                type="email"
+                placeholder="Email de l'élève"
+                value={eleveEmail}
+                onChange={(e) => setEleveEmail(e.target.value)}
+                required
+                icon={<MailIcon />}
+                delay={0.2}
+              />
+
+              <AnimatedInput
+                id="eleve-tel"
+                type="tel"
+                placeholder="Téléphone (optionnel)"
+                value={eleveTelephone}
+                onChange={(e) => setEleveTelephone(e.target.value)}
+                icon={<PhoneIcon />}
+                delay={0.25}
+              />
+
+              <AnimatedInput
+                id="eleve-date-naissance"
+                type="date"
+                placeholder="Date de naissance"
+                value={dateNaissance}
+                onChange={(e) => setDateNaissance(e.target.value)}
+                required
+                icon={<CalendarIcon />}
+                delay={0.2}
+              />
+
+              <AnimatedInput
+                id="eleve-lieu-naissance"
+                placeholder="Lieu de naissance"
+                value={lieuNaissance}
+                onChange={(e) => setLieuNaissance(e.target.value)}
+                required
+                icon={<MapPinIcon />}
+                delay={0.25}
+              />
+
+              <AnimatedSelect
+                id="eleve-sexe"
+                value={sexe}
+                onChange={(e) => setSexe(e.target.value as "M" | "F")}
+                required
+                delay={0.3}
+                label="Sexe"
+              >
+                <option value="M">Masculin</option>
+                <option value="F">Féminin</option>
+              </AnimatedSelect>
+
+              <AnimatedInput
+                id="eleve-classe"
+                placeholder="Classe (ex: 6ème A)"
+                value={classe}
+                onChange={(e) => setClasse(e.target.value)}
+                required
+                icon={<UsersIcon />}
+                delay={0.35}
+              />
+
+              <FadeIn delay={0.4}>
+                <motion.button
+                  type="submit"
+                  className="btn-submit"
+                  disabled={eleveLoading}
+                  whileHover={!eleveLoading ? { scale: 1.02, boxShadow: "0 8px 24px rgba(37,99,235,0.3)" } : {}}
+                  whileTap={!eleveLoading ? { scale: 0.98 } : {}}
+                  transition={{ type: "spring", stiffness: 400, damping: 20 }}
                 >
-                  <option value="">Sélectionnez un établissement...</option>
-                  {etablissements.map((etab) => (
-                    <option key={etab.id} value={etab.id}>{etab.nom}</option>
-                  ))}
-                </AnimatedSelect>
-
-                <FadeIn delay={0.25}>
-                  <div className="form-actions">
-                    <label className="remember-me">
-                      <input type="checkbox" />
-                      Se souvenir de moi
-                    </label>
-                    <a href="#forgot" className="forgot-password-link">
-                      Mot de passe oublié ?
-                    </a>
-                  </div>
-                </FadeIn>
-
-                <FadeIn delay={0.3}>
-                  <motion.button
-                    type="submit"
-                    className="btn-submit"
-                    disabled={loading}
-                    whileHover={!loading ? { scale: 1.02, boxShadow: "0 8px 24px rgba(37,99,235,0.3)" } : {}}
-                    whileTap={!loading ? { scale: 0.98 } : {}}
-                    transition={{ type: "spring", stiffness: 400, damping: 20 }}
-                  >
-                    {loading ? (
-                      <motion.span
-                        className="spinner"
-                        animate={{ rotate: 360 }}
-                        transition={{ duration: 0.8, repeat: Infinity, ease: "linear" }}
-                      />
-                    ) : (
-                      "Se connecter"
-                    )}
-                  </motion.button>
-                </FadeIn>
-              </form>
-            </motion.div>
-          ) : (
-            <motion.div
-              key="register"
-              initial={{ opacity: 0, x: 30 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -30 }}
-              transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-            >
-              <FadeIn delay={0.05}>
-                <div className="form-header">
-                  <h3>Créer un Compte</h3>
-                  <p>
-                    Déjà inscrit ?{" "}
+                  {eleveLoading ? (
                     <motion.span
-                      className="form-toggle-link"
-                      onClick={switchToLogin}
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
-                    >
-                      Se connecter
-                    </motion.span>
-                  </p>
-                </div>
+                      className="spinner"
+                      animate={{ rotate: 360 }}
+                      transition={{ duration: 0.8, repeat: Infinity, ease: "linear" }}
+                    />
+                  ) : (
+                    "Inscrire l'élève"
+                  )}
+                </motion.button>
               </FadeIn>
-
-              {error && <AlertBanner type="error" message={error} />}
-
-              <form onSubmit={handleRegister}>
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px" }}>
-                  <AnimatedInput
-                    id="reg-prenom"
-                    placeholder="Prénom"
-                    value={regPrenom}
-                    onChange={(e) => setRegPrenom(e.target.value)}
-                    required
-                    icon={<UserIcon />}
-                    delay={0.1}
-                    style={{ paddingLeft: "36px" }}
-                  />
-                  <AnimatedInput
-                    id="reg-nom"
-                    placeholder="Nom"
-                    value={regNom}
-                    onChange={(e) => setRegNom(e.target.value)}
-                    required
-                    icon={<UserIcon />}
-                    delay={0.15}
-                    style={{ paddingLeft: "36px" }}
-                  />
-                </div>
-
-                <AnimatedInput
-                  id="reg-email"
-                  type="email"
-                  placeholder="Adresse Email"
-                  value={regEmail}
-                  onChange={(e) => setRegEmail(e.target.value)}
-                  required
-                  icon={<MailIcon />}
-                  delay={0.2}
-                />
-
-                <AnimatedInput
-                  id="reg-password"
-                  type="password"
-                  placeholder="Mot de passe"
-                  value={regPassword}
-                  onChange={(e) => setRegPassword(e.target.value)}
-                  required
-                  icon={<LockIcon />}
-                  delay={0.25}
-                />
-
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px" }}>
-                  <AnimatedSelect
-                    id="reg-role"
-                    value={regRole}
-                    onChange={(e) => setRegRole(e.target.value as Role)}
-                    required
-                    delay={0.3}
-                    label="Rôle"
-                    style={{ paddingLeft: "14px" }}
-                  >
-                    <option value="DIRECTEUR">Directeur</option>
-                    <option value="SECRETAIRE">Secrétaire</option>
-                    <option value="COMPTABLE">Comptable</option>
-                    <option value="PROFESSEUR">Professeur</option>
-                    <option value="ELEVE">Élève</option>
-                    <option value="PARENT">Parent</option>
-                  </AnimatedSelect>
-
-                  <AnimatedSelect
-                    id="reg-etablissement"
-                    value={regEtablissement}
-                    onChange={(e) => setRegEtablissement(e.target.value)}
-                    required
-                    delay={0.35}
-                    label="Établissement"
-                    style={{ paddingLeft: "14px" }}
-                  >
-                    <option value="">Sélectionnez...</option>
-                    {etablissements.map((etab) => (
-                      <option key={etab.id} value={etab.id}>{etab.nom}</option>
-                    ))}
-                  </AnimatedSelect>
-                </div>
-
-                <AnimatedInput
-                  id="reg-tel"
-                  type="tel"
-                  placeholder="Téléphone"
-                  value={regTelephone}
-                  onChange={(e) => setRegTelephone(e.target.value)}
-                  icon={<PhoneIcon />}
-                  delay={0.4}
-                />
-
-                <FadeIn delay={0.45}>
-                  <motion.button
-                    type="submit"
-                    className="btn-submit"
-                    disabled={loading}
-                    whileHover={!loading ? { scale: 1.02, boxShadow: "0 8px 24px rgba(37,99,235,0.3)" } : {}}
-                    whileTap={!loading ? { scale: 0.98 } : {}}
-                    transition={{ type: "spring", stiffness: 400, damping: 20 }}
-                  >
-                    {loading ? (
-                      <motion.span
-                        className="spinner"
-                        animate={{ rotate: 360 }}
-                        transition={{ duration: 0.8, repeat: Infinity, ease: "linear" }}
-                      />
-                    ) : (
-                      "Créer mon compte"
-                    )}
-                  </motion.button>
-                </FadeIn>
-              </form>
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </div>
+            </form>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </motion.div>
   );
 }
 
-export default Login;
+export default Inscription;

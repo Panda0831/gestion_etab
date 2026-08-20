@@ -9,7 +9,7 @@ interface UseAuthReturn {
   success: string;
   etablissements: Etablissement[];
   login: (payload: LoginPayload) => Promise<boolean>;
-  register: (payload: RegisterPayload) => Promise<boolean>;
+  register: (payload: RegisterPayload) => Promise<{ id: string } | null>;
   setError: (msg: string) => void;
   setSuccess: (msg: string) => void;
 }
@@ -64,44 +64,44 @@ export function useAuth(onLoginSuccess: (token: string) => void): UseAuthReturn 
     }
   };
 
-  const register = async (formData: RegisterPayload): Promise<boolean> => {
-    setError("");
-    setSuccess("");
+    const register = async (formData: RegisterPayload): Promise<{ id: string } | null> => {
+        setError("");
+        setSuccess("");
 
-    if (!formData.etablissementId) {
-      setError("Veuillez sélectionner un établissement");
-      return false;
-    }
+        if (!formData.etablissementId) {
+            setError("Veuillez sélectionner un établissement");
+            return null;
+        }
 
-    setLoading(true);
-    try {
-      const payload: Record<string, string> = {
-        email: formData.email,
-        motDePasse: formData.password,
-        nom: formData.nom,
-        prenom: formData.prenom,
-        role: formData.role,
-        etablissementId: formData.etablissementId,
-      };
-      if (formData.telephone) payload.telephone = formData.telephone;
+        setLoading(true);
+        try {
+            const payload: Record<string, string> = {
+            email: formData.email,
+            motDePasse: formData.password,
+            nom: formData.nom,
+            prenom: formData.prenom,
+            role: formData.role,
+            etablissementId: formData.etablissementId,
+            };
+            if (formData.telephone) payload.telephone = formData.telephone;
 
-      const res = await fetch(`${API_URL}/auth/register`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.message || "Échec de l'inscription");
+            const res = await fetch(`${API_URL}/auth/register`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload),
+            });
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.message || "Échec de l'inscription");
 
-      setSuccess("Inscription réussie ! Vous pouvez maintenant vous connecter.");
-      return true;
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Serveur injoignable.");
-      return false;
-    } finally {
-      setLoading(false);
-    }
-  };
+            setSuccess("Parent inscrit avec succès !");
+            return data; // { id, nom, prenom, email, ... }
+        } catch (err) {
+            setError(err instanceof Error ? err.message : "Serveur injoignable.");
+            return null;
+        } finally {
+            setLoading(false);
+        }
+    };
 
   return { loading, error, success, etablissements, login, register, setError, setSuccess };
 }
