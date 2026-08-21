@@ -8,7 +8,14 @@ export class EleveService {
   constructor(private readonly prisma: PrismaService) {}
 
   create(createEleveDto: CreateEleveDto) {
-    return this.prisma.eleve.create({ data: createEleveDto });
+    return this.prisma.eleve.create({
+      data: {
+        ...createEleveDto,
+        dateNaissance: createEleveDto.dateNaissance
+          ? new Date(createEleveDto.dateNaissance)
+          : undefined,
+      },
+    });
   }
 
   findAll() {

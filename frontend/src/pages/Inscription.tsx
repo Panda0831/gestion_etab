@@ -74,15 +74,16 @@ function Inscription() {
         etablissementId,
       };
       const createdUser = await post<RegisterPayload, User>("/auth/register", registerPayload, false);
-      setParentUserId(createdUser.id);
+      setParentUserId(createdUser.utilisateur.id);
       console.log("Utilisateur parent créé:", createdUser);
+      console.log("createdUser.id:", createdUser.utilisateur.id);
 
 
       // 3. Créer l'entité parent (table parent) avec token
       const createdParent = await post<ParentPayload, { id: string }>(
         "/parent",
         {
-          utilisateurId: createdUser.id,
+          utilisateurId: createdUser.utilisateur.id,
           profession,
         },
         true // route protégée
@@ -111,6 +112,7 @@ function Inscription() {
     setEleveLoading(true);
     try {
       // 1. Créer l'utilisateur élève (route protégée)
+      const matriculeTemp = '3350'
       const createdEleveUser = await post<RegisterPayload, User>(
         "/utilisateur",
         {
@@ -120,11 +122,13 @@ function Inscription() {
           telephone: eleveTelephone || undefined,
           role: "ELEVE",
           etablissementId,
+          motDePasse: crypto.randomUUID() // mot de passe temporaire
         },
         true
       );
 
       // 2. Créer l'entité élève avec le payload exact attendu
+      console.log("date de naissance:", dateNaissance);
       const elevePayload: ElevePayload = {
         utilisateurId: createdEleveUser.id,
         classeId: classe,
@@ -132,6 +136,7 @@ function Inscription() {
         dateNaissance,
         lieuNaissance,
         sexe,
+        matricule: matriculeTemp // matricule temporaire
         // matricule et statutInscription optionnels (backend les génère)
       };
       await post<ElevePayload, any>("/eleve", elevePayload, true);

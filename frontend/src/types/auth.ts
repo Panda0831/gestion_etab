@@ -39,7 +39,7 @@ export interface ElevePayload {
   utilisateurId: string;
   classeId: string; // ou classe: string?
   parentId: string;
-  matricule?: string; // optionnel car backend peut générer
+  matricule: string; // optionnel car backend peut générer
   dateNaissance: string;
   lieuNaissance: string;
   sexe: string; // "M" ou "F"
