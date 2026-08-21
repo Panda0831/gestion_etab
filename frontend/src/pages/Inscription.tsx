@@ -25,7 +25,8 @@ function Inscription() {
   const [step, setStep] = useState<"parent" | "eleve">("parent");
   const [parentUserId, setParentUserId] = useState<string | null>(null);
   const [parentId, setParentId] = useState<string | null>(null);
-  const [etablissementId, setEtablissementId] = useState("");
+  const etablissementId = localStorage.getItem("etablissementId");
+  console.log("Etablissement ID from localStorage:", etablissementId);
 
   // Champs parent (utilisateur)
   const [nom, setNom] = useState("");
@@ -52,7 +53,7 @@ function Inscription() {
   const handleSubmitParent = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!etablissementId) {
-      setParentError("Veuillez sélectionner un établissement");
+      setParentError("Etablissement ID manquant.");
       return;
     }
 
@@ -242,22 +243,6 @@ function Inscription() {
                 icon={<BriefcaseIcon />}
                 delay={0.25}
               />
-
-              <AnimatedSelect
-                id="reg-etablissement"
-                value={etablissementId}
-                onChange={(e) => setEtablissementId(e.target.value)}
-                required
-                delay={0.3}
-                label="Établissement"
-              >
-                <option value="">Sélectionnez...</option>
-                {etablissements.map((etab) => (
-                  <option key={etab.id} value={etab.id}>
-                    {etab.nom}
-                  </option>
-                ))}
-              </AnimatedSelect>
 
               <FadeIn delay={0.35}>
                 <motion.button

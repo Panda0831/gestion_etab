@@ -54,6 +54,7 @@ export function useAuth(onLoginSuccess: (token: string) => void): UseAuthReturn 
 
       setSuccess("Connexion réussie !");
       localStorage.setItem("token", data.accessToken);
+      localStorage.setItem("etablissementId", data.utilisateur.etablissementId);
       onLoginSuccess(data.accessToken);
       return true;
     } catch (err) {
@@ -67,11 +68,6 @@ export function useAuth(onLoginSuccess: (token: string) => void): UseAuthReturn 
     const register = async (formData: RegisterPayload): Promise<{ id: string } | null> => {
         setError("");
         setSuccess("");
-
-        if (!formData.etablissementId) {
-            setError("Veuillez sélectionner un établissement");
-            return null;
-        }
 
         setLoading(true);
         try {
