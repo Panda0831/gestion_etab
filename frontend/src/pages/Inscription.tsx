@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
@@ -15,8 +15,9 @@ import {
   MapPinIcon,
   UsersIcon,
 } from "../components/icons"; // adaptez le chemin
-import { post } from "../services/api";
+import { post, get } from "../services/api";
 import { RegisterPayload, User, ParentPayload, ElevePayload } from "../types/auth";
+import { Classe } from "../types/structureScolaire";
 
 function Inscription() {
   const navigate = useNavigate();
@@ -26,7 +27,23 @@ function Inscription() {
   const [parentUserId, setParentUserId] = useState<string | null>(null);
   const [parentId, setParentId] = useState<string | null>(null);
   const etablissementId = localStorage.getItem("etablissementId");
-  console.log("Etablissement ID from localStorage:", etablissementId);
+
+  const [classes, setClasses] = useState<Classe[]>([]);
+  const [classesLoading, setClassesLoading] = useState(true);
+  const [classesError, setClassesError] = useState("");
+  useEffect(() => {
+    const fetchClasses = async () => {
+      try {
+        const data = await get<Classe[]>("/classe", true);
+        setClasses(data);
+      } catch (err) {
+        setClassesError(err instanceof Error ? err.message : "Impossible de charger les classes.");
+      } finally {
+        setClassesLoading(false);
+      }
+    };
+    fetchClasses();
+  }, []);
 
   // Champs parent (utilisateur)
   const [nom, setNom] = useState("");
@@ -182,6 +199,7 @@ function Inscription() {
             {error && <AlertBanner type="error" message={error} />}
             {success && <AlertBanner type="success" message={success} />}
             {parentError && <AlertBanner type="error" message={parentError} />}
+            {classesError && <AlertBanner type="error" message={classesError} />}
 
             <form onSubmit={handleSubmitParent}>
               <FadeIn delay={0.05}>
@@ -360,15 +378,23 @@ function Inscription() {
                 <option value="F">Féminin</option>
               </AnimatedSelect>
 
-              <AnimatedInput
+              <AnimatedSelect
                 id="eleve-classe"
-                placeholder="Classe (ex: 6ème A)"
                 value={classe}
                 onChange={(e) => setClasse(e.target.value)}
                 required
-                icon={<UsersIcon />}
                 delay={0.35}
-              />
+                label="Classe"
+              >
+                <option value="" disabled>
+                  {classesLoading ? "Chargement des classes..." : "Sélectionnez une classe"}
+                </option>
+                {classes.map((c) => (
+                  <option key={c.id} value={c.id}>
+                    {c.nom} ({c.anneeScolaire})
+                  </option>
+                ))}
+              </AnimatedSelect>
 
               <FadeIn delay={0.4}>
                 <motion.button

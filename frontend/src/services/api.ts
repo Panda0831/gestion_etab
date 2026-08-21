@@ -40,3 +40,38 @@ export async function post<TPayload, TResponse>(
 
   return data as TResponse;
 }
+
+export async function get<TResponse>(
+  endpoint: string,
+  requiresAuth: boolean = true
+): Promise<TResponse> {
+  const headers: HeadersInit = {
+    "Content-Type": "application/json",
+  };
+
+  if (requiresAuth) {
+    const token = localStorage.getItem("token");
+    if (token) {
+      headers["Authorization"] = `Bearer ${token}`;
+    } else {
+      throw new Error("Authentification requise. Veuillez vous connecter.");
+    }
+  }
+
+  const res = await fetch(`${API_URL}${endpoint}`, {
+    method: "GET",
+    headers,
+  });
+
+  const data = await res.json();
+  console.log("API Response:", data);
+
+  if (!res.ok) {
+    if (res.status === 401) {
+      localStorage.removeItem("token");
+    }
+    throw new Error(data.message || `Erreur ${res.status}`);
+  }
+
+  return data as TResponse;
+}
