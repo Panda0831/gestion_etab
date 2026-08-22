@@ -26,7 +26,6 @@ export class CreatePointageDto {
 
   @ApiPropertyOptional({ example: '2026-08-08T16:30:00.000Z' })
   @IsDateString()
-  @IsOptional()
   heureDepart?: string;
 
   @ApiPropertyOptional({
