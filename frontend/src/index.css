@@ -93,3 +93,19 @@ body {
   font-size: 0.75rem;
   font-weight: 600;
 }
+
+.btn-valider-inscription {
+  padding: 10px 10px;
+  border-radius: 6px;
+  border: none;
+  background: #2563eb;
+  color: white;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.btn-valider-inscription:hover {
+  background: #1d4ed8;
+}

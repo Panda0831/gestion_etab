@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { get } from "../services/api";
+import { get, patch } from "../services/api";
 import { Eleve } from "../types/auth";
 
 const container = {
@@ -51,6 +51,24 @@ function ListeEleves() {
       month: "short",
       year: "numeric",
     });
+
+    const handleValiderInscription = async (eleveId: string) => {
+        try {
+            await patch<{ statutInscription: string }, Eleve>(
+            `/eleve/${eleveId}`,
+            { statutInscription: "INSCRIT" },
+            true
+            );
+            // mise à jour locale sans refetch complet
+            setEleves((prev) =>
+            prev.map((e) =>
+                e.id === eleveId ? { ...e, statutInscription: "INSCRIT" } : e
+            )
+            );
+        } catch (err) {
+            console.error("Erreur validation inscription:", err);
+        }
+        };
 
   return (
     <motion.div
@@ -116,6 +134,7 @@ function ListeEleves() {
                 <th>Lieu de naissance</th>
                 <th>Sexe</th>
                 <th>Statut</th>
+                <th>Action</th>
               </tr>
             </thead>
             <motion.tbody variants={container} initial="hidden" animate="visible">
@@ -143,12 +162,26 @@ function ListeEleves() {
                     <td>{eleve.lieuNaissance}</td>
                     <td>{eleve.sexe === "M" ? "Masculin" : "Féminin"}</td>
                     <td>
-                      <span
-                        className="eleve-statut-badge"
-                        style={{ color: statut.color, backgroundColor: statut.bg }}
-                      >
-                        {eleve.statutInscription}
-                      </span>
+                        <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                            <span
+                            className="eleve-statut-badge"
+                            style={{ color: statut.color, backgroundColor: statut.bg }}
+                            >
+                            {eleve.statutInscription}
+                            </span>
+                        </div>
+                    </td>
+                    <td>
+                      <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                            {eleve.statutInscription !== "INSCRIT" && (
+                                <button
+                                    className="btn-valider-inscription"
+                                    onClick={() => handleValiderInscription(eleve.id)}
+                                >
+                                    Valider Inscription
+                                </button>
+                            )}
+                      </div>
                     </td>
                   </motion.tr>
                 );
