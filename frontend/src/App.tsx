@@ -7,6 +7,7 @@ import Home from "./pages/Home";
 import Inscription from "./pages/Inscription";
 import { User } from "./types/auth";
 import "./App.css";
+import ListeEleves from "./pages/ListEleve";
 
 const API_URL = "http://localhost:3000";
 
@@ -46,6 +47,7 @@ function AnimatedRoutes({
           path="/inscription"
           element={<Inscription onLoginSuccess={onLoginSuccess} />}
         />
+        <Route path="/eleves" element={<ListeEleves />} />
       </Routes>
     </AnimatePresence>
   );

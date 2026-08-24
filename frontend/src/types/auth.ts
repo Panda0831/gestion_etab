@@ -29,3 +29,18 @@ export interface RegisterPayload {
   role: Role;
   etablissementId: string;
 }
+
+export interface Eleve {
+  id: string;
+  utilisateurId: string;
+  classeId: string;
+  parentId: string;
+  matricule: string;
+  dateNaissance: string;
+  lieuNaissance: string;
+  sexe: "M" | "F";
+  statutInscription: string;
+  utilisateur?: User;
+  classe?: Classe;
+  parent?: Parent; // si vous avez cette interface
+}
