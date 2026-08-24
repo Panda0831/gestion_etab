@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { get, patch } from "../services/api";
 import { Eleve } from "../types/auth";
+import { PaginatedResponse } from "../types/type";
 
 const container = {
   hidden: { opacity: 0 },
@@ -26,16 +27,28 @@ const statutColors: Record<string, { color: string; bg: string }> = {
   RADIE: { color: "#ef4444", bg: "#fef2f2" },
 };
 
+const LIMIT = 10;
+
 function ListeEleves() {
   const [eleves, setEleves] = useState<Eleve[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [total, setTotal] = useState(0);
+
   useEffect(() => {
     const fetchEleves = async () => {
+      setLoading(true);
       try {
-        const data = await get<Eleve[]>("/eleve", true);
-        setEleves(data);
+        const result = await get<PaginatedResponse<Eleve>>(
+          `/eleve?page=${page}&limit=${LIMIT}`,
+          true
+        );
+        setEleves(result.data);
+        setTotalPages(result.totalPages);
+        setTotal(result.total);
       } catch (err) {
         setError(err instanceof Error ? err.message : "Impossible de charger les élèves.");
       } finally {
@@ -43,7 +56,7 @@ function ListeEleves() {
       }
     };
     fetchEleves();
-  }, []);
+  }, [page]);
 
   const formatDate = (dateStr: string) =>
     new Date(dateStr).toLocaleDateString("fr-FR", {
@@ -52,23 +65,22 @@ function ListeEleves() {
       year: "numeric",
     });
 
-    const handleValiderInscription = async (eleveId: string) => {
-        try {
-            await patch<{ statutInscription: string }, Eleve>(
-            `/eleve/${eleveId}`,
-            { statutInscription: "INSCRIT" },
-            true
-            );
-            // mise à jour locale sans refetch complet
-            setEleves((prev) =>
-            prev.map((e) =>
-                e.id === eleveId ? { ...e, statutInscription: "INSCRIT" } : e
-            )
-            );
-        } catch (err) {
-            console.error("Erreur validation inscription:", err);
-        }
-        };
+  const handleValiderInscription = async (eleveId: string) => {
+    try {
+      await patch<{ statutInscription: string }, Eleve>(
+        `/eleve/${eleveId}`,
+        { statutInscription: "INSCRIT" },
+        true
+      );
+      setEleves((prev) =>
+        prev.map((e) =>
+          e.id === eleveId ? { ...e, statutInscription: "INSCRIT" } : e
+        )
+      );
+    } catch (err) {
+      console.error("Erreur validation inscription:", err);
+    }
+  };
 
   return (
     <motion.div
@@ -102,7 +114,7 @@ function ListeEleves() {
             animate={{ scale: 1 }}
             transition={{ delay: 0.4, type: "spring", stiffness: 400, damping: 15 }}
           >
-            {eleves.length}
+            {total}
           </motion.span>
         </div>
 
@@ -124,70 +136,84 @@ function ListeEleves() {
             <span>Aucun élève inscrit</span>
           </div>
         ) : (
-          <table className="eleves-table">
-            <thead>
-              <tr>
-                <th>Élève</th>
-                <th>Matricule</th>
-                <th>Classe</th>
-                <th>Date de naissance</th>
-                <th>Lieu de naissance</th>
-                <th>Sexe</th>
-                <th>Statut</th>
-                <th>Action</th>
-              </tr>
-            </thead>
-            <motion.tbody variants={container} initial="hidden" animate="visible">
-              {eleves.map((eleve) => {
-                const statut = statutColors[eleve.statutInscription] || statutColors.EN_ATTENTE;
-                return (
-                  <motion.tr key={eleve.id} variants={row} whileHover={{ backgroundColor: "#f8fafc" }}>
-                    <td>
-                      <div className="eleve-cell-name">
-                        <span className="eleve-avatar">
-                          {eleve.utilisateur?.prenom?.[0]}
-                          {eleve.utilisateur?.nom?.[0]}
-                        </span>
-                        <div>
-                          <div className="eleve-nom">
-                            {eleve.utilisateur?.prenom} {eleve.utilisateur?.nom}
+          <>
+            <table className="eleves-table">
+              <thead>
+                <tr>
+                  <th>Élève</th>
+                  <th>Matricule</th>
+                  <th>Classe</th>
+                  <th>Date de naissance</th>
+                  <th>Lieu de naissance</th>
+                  <th>Sexe</th>
+                  <th>Statut</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <motion.tbody variants={container} initial="hidden" animate="visible">
+                {eleves.map((eleve) => {
+                  const statut = statutColors[eleve.statutInscription] || statutColors.EN_ATTENTE;
+                  return (
+                    <motion.tr key={eleve.id} variants={row} whileHover={{ backgroundColor: "#f8fafc" }}>
+                      <td>
+                        <div className="eleve-cell-name">
+                          <span className="eleve-avatar">
+                            {eleve.utilisateur?.prenom?.[0]}
+                            {eleve.utilisateur?.nom?.[0]}
+                          </span>
+                          <div>
+                            <div className="eleve-nom">
+                              {eleve.utilisateur?.prenom} {eleve.utilisateur?.nom}
+                            </div>
+                            <div className="eleve-email">{eleve.utilisateur?.email}</div>
                           </div>
-                          <div className="eleve-email">{eleve.utilisateur?.email}</div>
                         </div>
-                      </div>
-                    </td>
-                    <td>{eleve.matricule}</td>
-                    <td>{eleve.classe?.nom ?? "—"}</td>
-                    <td>{formatDate(eleve.dateNaissance)}</td>
-                    <td>{eleve.lieuNaissance}</td>
-                    <td>{eleve.sexe === "M" ? "Masculin" : "Féminin"}</td>
-                    <td>
+                      </td>
+                      <td>{eleve.matricule}</td>
+                      <td>{eleve.classe?.nom ?? "—"}</td>
+                      <td>{formatDate(eleve.dateNaissance)}</td>
+                      <td>{eleve.lieuNaissance}</td>
+                      <td>{eleve.sexe === "M" ? "Masculin" : "Féminin"}</td>
+                      <td>
                         <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                            <span
+                          <span
                             className="eleve-statut-badge"
                             style={{ color: statut.color, backgroundColor: statut.bg }}
-                            >
+                          >
                             {eleve.statutInscription}
-                            </span>
+                          </span>
                         </div>
-                    </td>
-                    <td>
-                      <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                            {eleve.statutInscription !== "INSCRIT" && (
-                                <button
-                                    className="btn-valider-inscription"
-                                    onClick={() => handleValiderInscription(eleve.id)}
-                                >
-                                    Valider Inscription
-                                </button>
-                            )}
-                      </div>
-                    </td>
-                  </motion.tr>
-                );
-              })}
-            </motion.tbody>
-          </table>
+                      </td>
+                      <td>
+                        <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                          {eleve.statutInscription !== "INSCRIT" && (
+                            <button
+                              className="btn-valider-inscription"
+                              onClick={() => handleValiderInscription(eleve.id)}
+                            >
+                              Valider Inscription
+                            </button>
+                          )}
+                        </div>
+                      </td>
+                    </motion.tr>
+                  );
+                })}
+              </motion.tbody>
+            </table>
+
+            <div className="pagination">
+              <button disabled={page === 1} onClick={() => setPage((p) => p - 1)}>
+                Précédent
+              </button>
+              <span>
+                Page {page} / {totalPages}
+              </span>
+              <button disabled={page === totalPages} onClick={() => setPage((p) => p + 1)}>
+                Suivant
+              </button>
+            </div>
+          </>
         )}
       </motion.div>
     </motion.div>

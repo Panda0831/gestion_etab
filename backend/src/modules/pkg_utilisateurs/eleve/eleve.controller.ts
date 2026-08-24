@@ -6,6 +6,7 @@ import {
   Patch,
   Param,
   Delete,
+  Query,
 } from '@nestjs/common';
 import { EleveService } from './eleve.service';
 import { CreateEleveDto } from './dto/create-eleve.dto';
@@ -21,8 +22,14 @@ export class EleveController {
   }
 
   @Get()
-  findAll() {
-    return this.eleveService.findAll();
+  findAll(
+    @Query('page') page?: string,
+    @Query('limit') limit?: string,
+  ) {
+    return this.eleveService.findAll(
+      page ? parseInt(page, 10) : 1,
+      limit ? parseInt(limit, 10) : 6,
+    );
   }
 
   @Get(':id')
