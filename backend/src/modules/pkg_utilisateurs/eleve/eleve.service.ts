@@ -11,17 +11,44 @@ export class EleveService {
     return this.prisma.eleve.create({ data: createEleveDto });
   }
 
-  async findAll(page: number = 1, limit: number = 2) {
+  async findAll(
+    page: number = 1,
+    limit: number = 6,
+    search?: string,
+    classeId?: string,
+    statutInscription?: string,
+  ) {
     const skip = (page - 1) * limit;
+
+    const where: any = {};
+
+    if (search) {
+      where.utilisateur = {
+        OR: [
+          { nom: { contains: search, mode: "insensitive" } },
+          { prenom: { contains: search, mode: "insensitive" } },
+          { email: { contains: search, mode: "insensitive" } },
+        ],
+      };
+    }
+
+    if (classeId) {
+      where.classeId = classeId;
+    }
+
+    if (statutInscription) {
+      where.statutInscription = statutInscription;
+    }
 
     const [data, total] = await Promise.all([
       this.prisma.eleve.findMany({
+        where,
         skip,
         take: limit,
         include: { utilisateur: true, classe: true, parent: true },
-        orderBy: { utilisateur: { nom: "asc" } }, // optionnel, pour un ordre stable
+        orderBy: { utilisateur: { nom: "asc" } },
       }),
-      this.prisma.eleve.count(),
+      this.prisma.eleve.count({ where }),
     ]);
 
     return {

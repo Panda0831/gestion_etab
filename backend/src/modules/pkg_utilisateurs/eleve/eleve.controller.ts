@@ -25,10 +25,16 @@ export class EleveController {
   findAll(
     @Query('page') page?: string,
     @Query('limit') limit?: string,
+    @Query('search') search?: string,
+    @Query('classeId') classeId?: string,
+    @Query('statutInscription') statutInscription?: string,
   ) {
     return this.eleveService.findAll(
       page ? parseInt(page, 10) : 1,
       limit ? parseInt(limit, 10) : 6,
+      search,
+      classeId,
+      statutInscription,
     );
   }
 

@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { get, patch } from "../services/api";
 import { Eleve } from "../types/auth";
 import { PaginatedResponse } from "../types/type";
+import { Classe } from "../types/structureScolaire";
 
 const container = {
   hidden: { opacity: 0 },
@@ -27,7 +28,7 @@ const statutColors: Record<string, { color: string; bg: string }> = {
   RADIE: { color: "#ef4444", bg: "#fef2f2" },
 };
 
-const LIMIT = 10;
+const LIMIT = 6;
 
 function ListeEleves() {
   const [eleves, setEleves] = useState<Eleve[]>([]);
@@ -38,25 +39,50 @@ function ListeEleves() {
   const [totalPages, setTotalPages] = useState(1);
   const [total, setTotal] = useState(0);
 
+  const [searchInput, setSearchInput] = useState("");
+  const [search, setSearch] = useState("");
+  const [classeFilter, setClasseFilter] = useState("");
+  const [statutFilter, setStatutFilter] = useState("");
+  const [classes, setClasses] = useState<Classe[]>([]);
+
+  // Charger les classes pour le filtre déroulant
+  useEffect(() => {
+    get<Classe[]>("/classe", true)
+      .then(setClasses)
+      .catch(() => {});
+  }, []);
+
+  // Charger les élèves selon page / recherche / filtres
   useEffect(() => {
     const fetchEleves = async () => {
       setLoading(true);
       try {
+        const params = new URLSearchParams({
+          page: String(page),
+          limit: String(LIMIT),
+        });
+        if (search) params.append("search", search);
+        if (classeFilter) params.append("classeId", classeFilter);
+        if (statutFilter) params.append("statutInscription", statutFilter);
+
         const result = await get<PaginatedResponse<Eleve>>(
-          `/eleve?page=${page}&limit=${LIMIT}`,
+          `/eleve?${params.toString()}`,
           true
         );
         setEleves(result.data);
         setTotalPages(result.totalPages);
         setTotal(result.total);
+        setError("");
       } catch (err) {
-        setError(err instanceof Error ? err.message : "Impossible de charger les élèves.");
+        setError(
+          err instanceof Error ? err.message : "Impossible de charger les élèves."
+        );
       } finally {
         setLoading(false);
       }
     };
     fetchEleves();
-  }, [page]);
+  }, [page, search, classeFilter, statutFilter]);
 
   const formatDate = (dateStr: string) =>
     new Date(dateStr).toLocaleDateString("fr-FR", {
@@ -64,6 +90,11 @@ function ListeEleves() {
       month: "short",
       year: "numeric",
     });
+
+  const handleSearch = () => {
+    setPage(1);
+    setSearch(searchInput);
+  };
 
   const handleValiderInscription = async (eleveId: string) => {
     try {
@@ -118,6 +149,51 @@ function ListeEleves() {
           </motion.span>
         </div>
 
+        {/* Barre de recherche et filtres */}
+        <div className="eleves-filters">
+          <input
+            type="text"
+            placeholder="Rechercher (nom, prénom, email)..."
+            value={searchInput}
+            onChange={(e) => setSearchInput(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+            className="eleves-search-input"
+          />
+          <button className="btn-search" onClick={handleSearch}>
+            Rechercher
+          </button>
+
+          <select
+            value={classeFilter}
+            onChange={(e) => {
+              setPage(1);
+              setClasseFilter(e.target.value);
+            }}
+            className="eleves-filter-select"
+          >
+            <option value="">Toutes les classes</option>
+            {classes.map((c) => (
+              <option key={c.id} value={c.id}>
+                {c.nom}
+              </option>
+            ))}
+          </select>
+
+          <select
+            value={statutFilter}
+            onChange={(e) => {
+              setPage(1);
+              setStatutFilter(e.target.value);
+            }}
+            className="eleves-filter-select"
+          >
+            <option value="">Tous les statuts</option>
+            <option value="INSCRIT">Inscrit</option>
+            <option value="EN_ATTENTE">En attente</option>
+            <option value="NON_INSCRT">Non inscrit</option>
+          </select>
+        </div>
+
         {loading ? (
           <div className="dash-empty">
             <motion.div
@@ -133,7 +209,7 @@ function ListeEleves() {
           </div>
         ) : eleves.length === 0 ? (
           <div className="dash-empty">
-            <span>Aucun élève inscrit</span>
+            <span>Aucun élève trouvé</span>
           </div>
         ) : (
           <>
@@ -152,9 +228,14 @@ function ListeEleves() {
               </thead>
               <motion.tbody variants={container} initial="hidden" animate="visible">
                 {eleves.map((eleve) => {
-                  const statut = statutColors[eleve.statutInscription] || statutColors.EN_ATTENTE;
+                  const statut =
+                    statutColors[eleve.statutInscription] || statutColors.EN_ATTENTE;
                   return (
-                    <motion.tr key={eleve.id} variants={row} whileHover={{ backgroundColor: "#f8fafc" }}>
+                    <motion.tr
+                      key={eleve.id}
+                      variants={row}
+                      whileHover={{ backgroundColor: "#f8fafc" }}
+                    >
                       <td>
                         <div className="eleve-cell-name">
                           <span className="eleve-avatar">
@@ -209,7 +290,10 @@ function ListeEleves() {
               <span>
                 Page {page} / {totalPages}
               </span>
-              <button disabled={page === totalPages} onClick={() => setPage((p) => p + 1)}>
+              <button
+                disabled={page === totalPages}
+                onClick={() => setPage((p) => p + 1)}
+              >
                 Suivant
               </button>
             </div>
