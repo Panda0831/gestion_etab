@@ -5,6 +5,8 @@ import Navbar from "./components/NavBar";
 import Login from "./components/Login";
 import Home from "./pages/Home";
 import Inscription from "./pages/Inscription";
+import Configuration from "./pages/Configuration";
+import DirectorDashboard from "./pages/director/DirectorDashboard";
 import { User } from "./types/auth";
 import "./App.css";
 import ListeEleves from "./pages/ListEleve";
@@ -33,7 +35,11 @@ function AnimatedRoutes({
           path="/"
           element={
             user ? (
-              <Home user={user} />
+              user.role === "DIRECTEUR" ? (
+                <DirectorDashboard user={user} onLogout={onLogout} />
+              ) : (
+                <Home user={user} />
+              )
             ) : (
               <Login
                 onLoginSuccess={onLoginSuccess}
@@ -48,6 +54,16 @@ function AnimatedRoutes({
           element={<Inscription onLoginSuccess={onLoginSuccess} />}
         />
         <Route path="/eleves" element={<ListeEleves />} />
+        <Route
+          path="/configuration"
+          element={
+            user?.role === "DIRECTEUR" ? (
+              <Configuration user={user} />
+            ) : (
+              <Home user={user} />
+            )
+          }
+        />
       </Routes>
     </AnimatePresence>
   );
@@ -95,10 +111,12 @@ function App() {
     setUser(null);
   };
 
+  const isDirector = user?.role === "DIRECTEUR";
+
   return (
     <BrowserRouter>
-      <div className={`app-container ${user ? "app-logged-in" : "app-guest"}`}>
-        <Navbar user={user} onLogout={handleLogout} />
+      <div className={`app-container ${user ? "app-logged-in" : "app-guest"} ${isDirector ? "app-director-mode" : ""}`}>
+        {!isDirector && <Navbar user={user} onLogout={handleLogout} />}
         <AnimatedRoutes
           user={user}
           onLoginSuccess={handleLoginSuccess}

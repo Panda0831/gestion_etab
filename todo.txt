@@ -1,0 +1,28 @@
+=== TO-DO LIST : ESPACE DIRECTION (DIRECTEUR) ===
+
+[x] Étape 1 : Authentification et Redirection
+    [x] Configurer la redirection spécifique après Login pour le rôle DIRECTEUR
+    [x] Personnaliser la NavBar pour afficher uniquement les onglets du Directeur
+
+[x] Étape 2 : Tableau de Bord du Directeur (DirectorDashboard)
+    [x] Interface d'accueil (Statistiques globales, activités récentes de l'établissement)
+    [x] Intégration d'indicateurs de performance (élèves, professeurs, inscriptions en attente)
+
+[ ] Étape 3 : Structure Académique (Niveaux, Classes, Matières)
+    [ ] Gestion complète des Niveaux (Création, lecture, modification, suppression)
+    [ ] Gestion complète des Classes (Création, lecture, modification, suppression, affectation au niveau)
+    [ ] Gestion des Matières (Création, coefficients, association)
+
+[ ] Étape 4 : Gestion du Personnel & Enseignants
+    [ ] Liste et recherche du personnel (Secrétaires, Comptables, Professeurs)
+    [ ] Formulaire d'ajout / invitation de nouveau personnel avec choix de rôle
+    [ ] Affectation des professeurs aux matières et classes
+
+[ ] Étape 5 : Gestion des Inscriptions / Admissions
+    [ ] Interface de validation des demandes d'inscription / réinscription en attente
+    [ ] Attribution d'une classe lors de la validation
+    [ ] Notification de l'état d'avancement aux parents/élèves
+
+[ ] Étape 6 : Paramètres de l'Établissement & Tarification
+    [ ] Formulaire de modification des infos de l'établissement
+    [ ] Configuration des frais (Inscription, Réinscription)

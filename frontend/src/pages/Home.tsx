@@ -385,15 +385,18 @@ function Home({ user }: HomeProps) {
           animate={{ opacity: 1, x: 0 }}
           transition={{ delay: 0.1, duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
         >
-          {greeting}, {user?.prenom}{' '}
+          {greeting}, {user?.prenom}{" "}
           <motion.span
             initial={{ scale: 0, rotate: -30 }}
             animate={{ scale: 1, rotate: 0 }}
-            transition={{ delay: 0.5, type: 'spring', stiffness: 300, damping: 12 }}
-            style={{ display: 'inline-block', originX: 0.7, originY: 0.7 }}
-          >
-            👋
-          </motion.span>
+            transition={{
+              delay: 0.5,
+              type: "spring",
+              stiffness: 300,
+              damping: 12,
+            }}
+            style={{ display: "inline-block", originX: 0.7, originY: 0.7 }}
+          ></motion.span>
         </motion.h1>
         <motion.p
           initial={{ opacity: 0, y: 8 }}
