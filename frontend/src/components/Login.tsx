@@ -31,7 +31,6 @@ function Login({ onLoginSuccess, onLogout, currentUser }: LoginProps) {
   // Login fields
   const [loginEmail, setLoginEmail] = useState("");
   const [loginPassword, setLoginPassword] = useState("");
-  const [loginEtablissement, setLoginEtablissement] = useState("");
 
   // Register fields
   const [regEmail, setRegEmail] = useState("");
@@ -47,7 +46,6 @@ function Login({ onLoginSuccess, onLogout, currentUser }: LoginProps) {
     await login({
       email: loginEmail,
       password: loginPassword,
-      etablissementId: loginEtablissement,
     });
   };
 
@@ -290,21 +288,7 @@ function Login({ onLoginSuccess, onLogout, currentUser }: LoginProps) {
                   }
                 />
 
-                <AnimatedSelect
-                  id="login-etablissement"
-                  value={loginEtablissement}
-                  onChange={(e) => setLoginEtablissement(e.target.value)}
-                  delay={0.2}
-                  label="Établissement"
-                  optional
-                >
-                  <option value="">Sélectionnez un établissement...</option>
-                  {etablissements.map((etab) => (
-                    <option key={etab.id} value={etab.id}>{etab.nom}</option>
-                  ))}
-                </AnimatedSelect>
-
-                <FadeIn delay={0.25}>
+                <FadeIn delay={0.2}>
                   <div className="form-actions">
                     <label className="remember-me">
                       <input type="checkbox" />
@@ -375,7 +359,6 @@ function Login({ onLoginSuccess, onLogout, currentUser }: LoginProps) {
                     required
                     icon={<UserIcon />}
                     delay={0.1}
-                    style={{ paddingLeft: "36px" }}
                   />
                   <AnimatedInput
                     id="reg-nom"
@@ -385,7 +368,6 @@ function Login({ onLoginSuccess, onLogout, currentUser }: LoginProps) {
                     required
                     icon={<UserIcon />}
                     delay={0.15}
-                    style={{ paddingLeft: "36px" }}
                   />
                 </div>
 
@@ -419,7 +401,6 @@ function Login({ onLoginSuccess, onLogout, currentUser }: LoginProps) {
                     required
                     delay={0.3}
                     label="Rôle"
-                    style={{ paddingLeft: "14px" }}
                   >
                     <option value="DIRECTEUR">Directeur</option>
                     <option value="SECRETAIRE">Secrétaire</option>
@@ -436,7 +417,6 @@ function Login({ onLoginSuccess, onLogout, currentUser }: LoginProps) {
                     required
                     delay={0.35}
                     label="Établissement"
-                    style={{ paddingLeft: "14px" }}
                   >
                     <option value="">Sélectionnez...</option>
                     {etablissements.map((etab) => (

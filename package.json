@@ -1,18 +1,13 @@
 {
   "name": "gestion-etablissement",
   "version": "1.0.0",
-<<<<<<< Updated upstream
-  "description": "Système complet de gestion scolaire et d'établissement",
-  "main": "index.js",
+  "description": "Système complet de gestion scolaire et d'établissement (NestJS + Prisma + PostgreSQL)",
+  "main": "dist/main.js",
   "private": true,
   "workspaces": [
     "backend",
     "frontend"
   ],
-=======
-  "description": "Système complet de gestion scolaire et d'établissement (NestJS + Prisma + PostgreSQL)",
-  "main": "dist/main.js",
->>>>>>> Stashed changes
   "scripts": {
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
@@ -27,15 +22,12 @@
     "prisma:seed": "ts-node prisma/seed.ts",
     "docker:up": "docker compose up -d",
     "docker:down": "docker compose down",
-<<<<<<< Updated upstream
     "frontend:dev": "cd frontend && npm run dev",
-    "frontend:build": "cd frontend && npm run build"
-=======
+    "frontend:build": "cd frontend && npm run build",
     "test": "jest",
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "test:e2e": "jest --config ./test/jest-e2e.json"
->>>>>>> Stashed changes
   },
   "keywords": [
     "school-management",
@@ -48,13 +40,6 @@
   ],
   "author": "",
   "license": "ISC",
-<<<<<<< Updated upstream
-  "devDependencies": {
-    "prisma": "^5.22.0",
-    "typescript": "^5.9.3"
-  },
-=======
->>>>>>> Stashed changes
   "dependencies": {
     "@aws-sdk/client-s3": "^3.500.0",
     "@nestjs-modules/mailer": "^1.10.1",
