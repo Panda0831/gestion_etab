@@ -7,10 +7,6 @@ interface HomeProps {
   user: User | null;
 }
 
-/* ═══════════════════════════════════════════
-   Animated Counter (0 → value)
-   ═══════════════════════════════════════════ */
-
 function AnimatedCounter({
   target,
   duration = 1.2,
@@ -43,10 +39,6 @@ function AnimatedCounter({
 
   return <span ref={ref}>{count}</span>;
 }
-
-/* ═══════════════════════════════════════════
-   Animation variants
-   ═══════════════════════════════════════════ */
 
 const container = {
   hidden: { opacity: 0 },
@@ -101,10 +93,6 @@ const eventItem = {
     transition: { delay: i * 0.07, duration: 0.4, ease: [0.22, 1, 0.36, 1] },
   }),
 };
-
-/* ═══════════════════════════════════════════
-   Icon SVGs
-   ═══════════════════════════════════════════ */
 
 function UserGroupIcon() {
   return (
@@ -247,10 +235,6 @@ function SparkleIcon() {
   );
 }
 
-/* ═══════════════════════════════════════════
-   Color maps
-   ═══════════════════════════════════════════ */
-
 const activityMeta: Record<
   string,
   { color: string; bg: string; label: string }
@@ -267,10 +251,6 @@ const eventColors: Record<string, string> = {
   examen: "#ef4444",
   evenement: "#f59e0b",
 };
-
-/* ═══════════════════════════════════════════
-   StatCard with animated counter + glow
-   ═══════════════════════════════════════════ */
 
 interface StatCardProps {
   label: string;
@@ -321,10 +301,6 @@ function StatCard({ label, value, icon, color, bg, suffix }: StatCardProps) {
     </motion.div>
   );
 }
-
-/* ═══════════════════════════════════════════
-   Main Dashboard
-   ═══════════════════════════════════════════ */
 
 function Home({ user }: HomeProps) {
   const token = localStorage.getItem("token") || "";

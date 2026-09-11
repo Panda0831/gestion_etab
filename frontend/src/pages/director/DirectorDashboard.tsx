@@ -13,6 +13,10 @@ import {
   TeacherIcon,
   WarningIcon,
   CheckIcon,
+  CloseIcon,
+  PencilIcon,
+  TrashIcon,
+  LogoutIcon,
 } from "../../components/icons";
 import "./DirectorDashboard.css";
 
@@ -33,8 +37,7 @@ export default function DirectorDashboard({
       ? user.etablissement?.id
       : user?.etablissement;
 
-  // Navigation states matching screenshot sidebar
-  const [activeMenu, setActiveMenu] = useState("dashboard"); // dashboard, structure, matieres, personnel, inscriptions, parametres
+  const [activeMenu, setActiveMenu] = useState("dashboard");
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [openSubMenus, setOpenSubMenus] = useState<Record<string, boolean>>({
     gestionEcole: true,
@@ -50,11 +53,9 @@ export default function DirectorDashboard({
     setSidebarOpen(false);
   };
 
-  const toggleSubMenu = (menu: string) => {
+  const toggleSubMenu = (menu: string) =>
     setOpenSubMenus((prev) => ({ ...prev, [menu]: !prev[menu] }));
-  };
 
-  // Data states
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
@@ -70,7 +71,6 @@ export default function DirectorDashboard({
     demandesEnAttente: 0,
   });
 
-  // Personnel state
   const [staff, setStaff] = useState<any[]>([]);
   const [newStaff, setNewStaff] = useState({
     nom: "",
@@ -81,12 +81,10 @@ export default function DirectorDashboard({
     telephone: "",
   });
 
-  // Admissions state
   const [admissions, setAdmissions] = useState<any[]>([]);
   const [selectedAdmission, setSelectedAdmission] = useState<any | null>(null);
   const [assignClassId, setAssignClassId] = useState("");
 
-  // Forms states
   const [etabForm, setEtabForm] = useState({
     nom: "",
     adresse: "",
@@ -110,11 +108,28 @@ export default function DirectorDashboard({
     coefficient: 1,
   });
 
-  // Load dashboard data
+  const [editNiveauId, setEditNiveauId] = useState<string | null>(null);
+  const [editNiveauForm, setEditNiveauForm] = useState({
+    nom: "",
+    cycle: "",
+    ordre: 1,
+  });
+  const [editClasseId, setEditClasseId] = useState<string | null>(null);
+  const [editClasseForm, setEditClasseForm] = useState({
+    nom: "",
+    niveauId: "",
+    anneeScolaire: "",
+    effectif: 0,
+  });
+  const [editMatiereId, setEditMatiereId] = useState<string | null>(null);
+  const [editMatiereForm, setEditMatiereForm] = useState({
+    nom: "",
+    code: "",
+    coefficient: 1,
+  });
+
   useEffect(() => {
-    if (etablissementId) {
-      loadAllData();
-    }
+    if (etablissementId) loadAllData();
   }, [etablissementId]);
 
   const loadAllData = async () => {
@@ -126,7 +141,6 @@ export default function DirectorDashboard({
     };
 
     try {
-      // 1. Fetch Etablissement
       const etabRes = await fetch(
         `${API_URL}/etablissement/${etablissementId}`,
         { headers },
@@ -145,40 +159,31 @@ export default function DirectorDashboard({
         });
       }
 
-      // 2. Fetch Niveaux
       const nivRes = await fetch(`${API_URL}/niveau`, { headers });
       if (nivRes.ok) {
         const allNiveaux = await nivRes.json();
-        const filtered = allNiveaux.filter(
-          (n: any) => n.etablissementId === etablissementId,
+        setNiveaux(
+          allNiveaux.filter((n: any) => n.etablissementId === etablissementId),
         );
-        setNiveaux(filtered);
       }
 
-      // 3. Fetch Classes
       const classRes = await fetch(`${API_URL}/classe`, { headers });
-      if (classRes.ok) {
-        const allClasses = await classRes.json();
-        setClasses(allClasses);
-      }
+      if (classRes.ok) setClasses(await classRes.json());
 
-      // 4. Fetch Matieres
       const matRes = await fetch(`${API_URL}/matiere`, { headers });
       if (matRes.ok) {
         const allMatieres = await matRes.json();
-        const filtered = allMatieres.filter(
-          (m: any) => m.etablissementId === etablissementId,
+        setMatieres(
+          allMatieres.filter((m: any) => m.etablissementId === etablissementId),
         );
-        setMatieres(filtered);
       }
 
-      // 5. Fetch Dashboard stats
       const statsRes = await fetch(`${API_URL}/dashboard/stats`, { headers });
       if (statsRes.ok) {
         const statsData = await statsRes.json();
         setStats((prev) => ({ ...prev, ...statsData }));
       } else {
-        // Fallback mock stats if endpoint doesn't exist yet
+        // endpoint isn't live yet, use placeholder numbers so the layout still makes sense
         setStats({
           totalEleves: 142,
           totalProfesseurs: 18,
@@ -188,18 +193,17 @@ export default function DirectorDashboard({
         });
       }
 
-      // 6. Fetch Personnel (users related to this school)
       const staffRes = await fetch(`${API_URL}/utilisateurs`, { headers });
       if (staffRes.ok) {
         const allUsers = await staffRes.json();
-        const filteredStaff = allUsers.filter(
-          (u: any) =>
-            u.etablissementId === etablissementId ||
-            u.etablissement === etablissementId,
+        setStaff(
+          allUsers.filter(
+            (u: any) =>
+              u.etablissementId === etablissementId ||
+              u.etablissement === etablissementId,
+          ),
         );
-        setStaff(filteredStaff);
       } else {
-        // Mock staff
         setStaff([
           {
             id: "1",
@@ -228,7 +232,6 @@ export default function DirectorDashboard({
         ]);
       }
 
-      // 7. Fetch Admissions (eleves pending status)
       const admissionsRes = await fetch(`${API_URL}/eleves/admissions`, {
         headers,
       });
@@ -237,7 +240,6 @@ export default function DirectorDashboard({
         setAdmissions(pending);
         setStats((prev) => ({ ...prev, demandesEnAttente: pending.length }));
       } else {
-        // Mock admissions
         const mockAdmissions = [
           {
             id: "e1",
@@ -284,7 +286,6 @@ export default function DirectorDashboard({
     }
   };
 
-  // HANDLERS
   const handleUpdateEtab = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
@@ -313,8 +314,7 @@ export default function DirectorDashboard({
 
       if (res.ok) {
         setSuccess("L'établissement a été mis à jour avec succès.");
-        const updated = await res.json();
-        setEtab(updated);
+        setEtab(await res.json());
       } else {
         setError("Erreur lors de la mise à jour de l'établissement.");
       }
@@ -442,10 +442,7 @@ export default function DirectorDashboard({
       const res = await fetch(`${API_URL}/auth/register`, {
         method: "POST",
         headers,
-        body: JSON.stringify({
-          ...newStaff,
-          etablissementId,
-        }),
+        body: JSON.stringify({ ...newStaff, etablissementId }),
       });
 
       if (res.ok) {
@@ -464,12 +461,11 @@ export default function DirectorDashboard({
         setError("Erreur lors de l'ajout du membre du personnel.");
       }
     } catch {
-      // Simulate success if demo/offline
-      const mockNew = {
-        id: Math.random().toString(),
-        ...newStaff,
-      };
-      setStaff((prev) => [...prev, mockNew]);
+      // API not reachable — keep it usable in demo/offline mode
+      setStaff((prev) => [
+        ...prev,
+        { id: Math.random().toString(), ...newStaff },
+      ]);
       setSuccess("Membre ajouté (Mode Simulation).");
       setNewStaff({
         nom: "",
@@ -479,6 +475,174 @@ export default function DirectorDashboard({
         role: "PROFESSEUR",
         telephone: "",
       });
+    }
+  };
+
+  const handleStartEditNiveau = (niv: Niveau) => {
+    setEditNiveauId(niv.id);
+    setEditNiveauForm({
+      nom: niv.nom,
+      cycle: niv.cycle || "",
+      ordre: niv.ordre || 1,
+    });
+  };
+
+  const handleSaveEditNiveau = async (id: string) => {
+    setError("");
+    setSuccess("");
+    const headers = {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    };
+    try {
+      const res = await fetch(`${API_URL}/niveau/${id}`, {
+        method: "PATCH",
+        headers,
+        body: JSON.stringify(editNiveauForm),
+      });
+      if (res.ok) {
+        const updated = await res.json();
+        setNiveaux((prev) => prev.map((n) => (n.id === id ? updated : n)));
+        setEditNiveauId(null);
+        setSuccess("Niveau mis à jour avec succès.");
+      } else {
+        setError("Erreur lors de la mise à jour du niveau.");
+      }
+    } catch {
+      setError("Erreur réseau.");
+    }
+  };
+
+  const handleDeleteNiveau = async (id: string) => {
+    if (!window.confirm("Supprimer ce niveau et ses classes associées ?"))
+      return;
+    setError("");
+    setSuccess("");
+    try {
+      const res = await fetch(`${API_URL}/niveau/${id}`, {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (res.ok) {
+        setNiveaux((prev) => prev.filter((n) => n.id !== id));
+        setClasses((prev) => prev.filter((c) => c.niveauId !== id));
+        setSuccess("Niveau supprimé avec succès.");
+      } else {
+        setError("Erreur lors de la suppression du niveau.");
+      }
+    } catch {
+      setError("Erreur réseau.");
+    }
+  };
+
+  const handleStartEditClasse = (cls: Classe) => {
+    setEditClasseId(cls.id);
+    setEditClasseForm({
+      nom: cls.nom,
+      niveauId: cls.niveauId,
+      anneeScolaire: cls.anneeScolaire,
+      effectif: cls.effectif,
+    });
+  };
+
+  const handleSaveEditClasse = async (id: string) => {
+    setError("");
+    setSuccess("");
+    const headers = {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    };
+    try {
+      const res = await fetch(`${API_URL}/classe/${id}`, {
+        method: "PATCH",
+        headers,
+        body: JSON.stringify(editClasseForm),
+      });
+      if (res.ok) {
+        const updated = await res.json();
+        setClasses((prev) => prev.map((c) => (c.id === id ? updated : c)));
+        setEditClasseId(null);
+        setSuccess("Classe mise à jour avec succès.");
+      } else {
+        setError("Erreur lors de la mise à jour de la classe.");
+      }
+    } catch {
+      setError("Erreur réseau.");
+    }
+  };
+
+  const handleDeleteClasse = async (id: string) => {
+    if (!window.confirm("Supprimer cette classe ?")) return;
+    setError("");
+    setSuccess("");
+    try {
+      const res = await fetch(`${API_URL}/classe/${id}`, {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (res.ok) {
+        setClasses((prev) => prev.filter((c) => c.id !== id));
+        setSuccess("Classe supprimée avec succès.");
+      } else {
+        setError("Erreur lors de la suppression de la classe.");
+      }
+    } catch {
+      setError("Erreur réseau.");
+    }
+  };
+
+  const handleStartEditMatiere = (m: Matiere) => {
+    setEditMatiereId(m.id);
+    setEditMatiereForm({
+      nom: m.nom,
+      code: m.code || "",
+      coefficient: m.coefficient,
+    });
+  };
+
+  const handleSaveEditMatiere = async (id: string) => {
+    setError("");
+    setSuccess("");
+    const headers = {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    };
+    try {
+      const res = await fetch(`${API_URL}/matiere/${id}`, {
+        method: "PATCH",
+        headers,
+        body: JSON.stringify(editMatiereForm),
+      });
+      if (res.ok) {
+        const updated = await res.json();
+        setMatieres((prev) => prev.map((m) => (m.id === id ? updated : m)));
+        setEditMatiereId(null);
+        setSuccess("Matière mise à jour avec succès.");
+      } else {
+        setError("Erreur lors de la mise à jour de la matière.");
+      }
+    } catch {
+      setError("Erreur réseau.");
+    }
+  };
+
+  const handleDeleteMatiere = async (id: string) => {
+    if (!window.confirm("Supprimer cette matière ?")) return;
+    setError("");
+    setSuccess("");
+    try {
+      const res = await fetch(`${API_URL}/matiere/${id}`, {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (res.ok) {
+        setMatieres((prev) => prev.filter((m) => m.id !== id));
+        setSuccess("Matière supprimée avec succès.");
+      } else {
+        setError("Erreur lors de la suppression de la matière.");
+      }
+    } catch {
+      setError("Erreur réseau.");
     }
   };
 
@@ -511,7 +675,6 @@ export default function DirectorDashboard({
         setError("Erreur lors de la validation de l'inscription.");
       }
     } catch {
-      // Offline fallback
       setAdmissions((prev) => prev.filter((a) => a.id !== admissionId));
       setSelectedAdmission(null);
       setAssignClassId("");
@@ -526,15 +689,11 @@ export default function DirectorDashboard({
 
   return (
     <div className="dir-layout">
-      {/* Mobile Sidebar backdrop */}
       <div
         className={`sidebar-overlay ${sidebarOpen ? "mobile-open" : ""}`}
         onClick={() => setSidebarOpen(false)}
       />
 
-      {/* ═══════════════════════════════════════════
-         LEFT SIDEBAR (Sidebar Navigation)
-         ═══════════════════════════════════════════ */}
       <aside className="dir-sidebar-wrapper">
         <aside className={`dir-sidebar ${sidebarOpen ? "mobile-open" : ""}`}>
           <div className="dir-brand">
@@ -569,7 +728,6 @@ export default function DirectorDashboard({
               <span>Tableau de bord</span>
             </button>
 
-            {/* School Management Accordion */}
             <div className="dir-nav-accordion">
               <button
                 className={`dir-nav-item accordion-header ${openSubMenus.gestionEcole ? "open" : ""}`}
@@ -645,17 +803,13 @@ export default function DirectorDashboard({
               onClick={onLogout}
               title="Déconnexion"
             >
-              🚪
+              <LogoutIcon size={16} />
             </button>
           </div>
         </aside>
       </aside>
 
-      {/* ═══════════════════════════════════════════
-         MAIN CONTENT AREA
-         ═══════════════════════════════════════════ */}
       <main className="dir-main">
-        {/* Top Header */}
         <header className="dir-header">
           <div className="header-left">
             <button
@@ -698,11 +852,10 @@ export default function DirectorDashboard({
                 <span className="bell-badge"></span>
               )}
             </div>
-            <div className="lang-switcher">🇫🇷 FR</div>
+            <div className="lang-switcher">FR</div>
           </div>
         </header>
 
-        {/* Content Body */}
         <div className="dir-content-body">
           {error && <div className="alert-message error-banner">{error}</div>}
           {success && (
@@ -716,7 +869,6 @@ export default function DirectorDashboard({
             </div>
           ) : (
             <AnimatePresence mode="wait">
-              {/* ───────────────── VIEW: DASHBOARD ───────────────── */}
               {activeMenu === "dashboard" && (
                 <motion.div
                   key="dashboard"
@@ -726,55 +878,58 @@ export default function DirectorDashboard({
                   className="view-container"
                 >
                   <div className="welcome-banner-dir">
-                    <h2>Ravi de vous revoir, {user?.prenom} </h2>
+                    <span className="welcome-kicker">Espace direction</span>
+                    <h2>Ravi de vous revoir, {user?.prenom}</h2>
                     <p>
                       Voici l'état actuel de votre établissement pour
                       aujourd'hui.
                     </p>
                   </div>
 
-                  {/* Stat Cards Grid */}
                   <div className="stats-grid-dir">
-                    <div className="stat-card-dir blue">
+                    <div className="stat-card-dir">
+                      <span className="stat-index">01</span>
                       <div className="stat-icon-wrapper">
-                        <GraduateIcon size={24} />
+                        <GraduateIcon size={18} />
                       </div>
                       <div className="stat-details">
+                        <p className="stat-label">Élèves inscrits</p>
                         <h3>{stats.totalEleves}</h3>
-                        <p>Élèves inscrits</p>
                       </div>
                     </div>
-                    <div className="stat-card-dir purple">
+                    <div className="stat-card-dir">
+                      <span className="stat-index">02</span>
                       <div className="stat-icon-wrapper">
-                        <TeacherIcon size={24} />
+                        <TeacherIcon size={18} />
                       </div>
                       <div className="stat-details">
+                        <p className="stat-label">Professeurs actifs</p>
                         <h3>{stats.totalProfesseurs}</h3>
-                        <p>Professeurs actifs</p>
                       </div>
                     </div>
-                    <div className="stat-card-dir green">
+                    <div className="stat-card-dir">
+                      <span className="stat-index">03</span>
                       <div className="stat-icon-wrapper">
-                        <SchoolIcon size={24} />
+                        <SchoolIcon size={18} />
                       </div>
                       <div className="stat-details">
+                        <p className="stat-label">Classes</p>
                         <h3>{stats.totalClasses}</h3>
-                        <p>Classes</p>
                       </div>
                     </div>
-                    <div className="stat-card-dir red">
+                    <div className="stat-card-dir">
+                      <span className="stat-index">04</span>
                       <div className="stat-icon-wrapper">
-                        <WarningIcon size={24} />
+                        <WarningIcon size={18} />
                       </div>
                       <div className="stat-details">
+                        <p className="stat-label">Taux d'absence</p>
                         <h3>{stats.tauxAbsenteisme}%</h3>
-                        <p>Taux d'absence</p>
                       </div>
                     </div>
                   </div>
 
                   <div className="dashboard-sections-grid">
-                    {/* Quick actions panel */}
                     <div className="dash-section-card">
                       <h3>Raccourcis Administrateur</h3>
                       <div className="quick-actions-list">
@@ -799,7 +954,6 @@ export default function DirectorDashboard({
                       </div>
                     </div>
 
-                    {/* Quick status information */}
                     <div className="dash-section-card">
                       <h3>Informations Établissement</h3>
                       <div className="etab-quick-info">
@@ -811,11 +965,11 @@ export default function DirectorDashboard({
                         </p>
                         <p>
                           <strong>Frais d'inscription :</strong>{" "}
-                          {etab?.tarifs?.fraisInscription || 0} FCFA
+                          {etab?.tarifs?.fraisInscription || 0} AR
                         </p>
                         <p>
                           <strong>Frais de réinscription :</strong>{" "}
-                          {etab?.tarifs?.fraisReinscription || 0} FCFA
+                          {etab?.tarifs?.fraisReinscription || 0} AR
                         </p>
                       </div>
                     </div>
@@ -823,7 +977,6 @@ export default function DirectorDashboard({
                 </motion.div>
               )}
 
-              {/* ───────────────── VIEW: STRUCTURE ───────────────── */}
               {activeMenu === "structure" && (
                 <motion.div
                   key="structure"
@@ -833,7 +986,6 @@ export default function DirectorDashboard({
                   className="view-container"
                 >
                   <div className="grid-split">
-                    {/* Left Column: Levels Management */}
                     <div className="panel-card">
                       <div className="panel-header">
                         <h3>Gestion des Niveaux</h3>
@@ -881,15 +1033,87 @@ export default function DirectorDashboard({
                       <div className="items-list">
                         {niveaux.map((niv) => (
                           <div key={niv.id} className="list-item-row">
-                            <div className="item-main">
-                              <strong>{niv.nom}</strong>
-                              <span className="badge-sub">
-                                {niv.cycle || "Général"}
-                              </span>
-                            </div>
-                            <span className="badge-item">
-                              Ordre: {niv.ordre || 1}
-                            </span>
+                            {editNiveauId === niv.id ? (
+                              <div className="inline-edit-form">
+                                <input
+                                  type="text"
+                                  value={editNiveauForm.nom}
+                                  onChange={(e) =>
+                                    setEditNiveauForm({
+                                      ...editNiveauForm,
+                                      nom: e.target.value,
+                                    })
+                                  }
+                                  placeholder="Nom"
+                                />
+                                <input
+                                  type="text"
+                                  value={editNiveauForm.cycle}
+                                  onChange={(e) =>
+                                    setEditNiveauForm({
+                                      ...editNiveauForm,
+                                      cycle: e.target.value,
+                                    })
+                                  }
+                                  placeholder="Cycle"
+                                />
+                                <input
+                                  type="number"
+                                  value={editNiveauForm.ordre}
+                                  onChange={(e) =>
+                                    setEditNiveauForm({
+                                      ...editNiveauForm,
+                                      ordre: Number(e.target.value),
+                                    })
+                                  }
+                                  style={{ width: 70 }}
+                                />
+                                <div className="inline-edit-actions">
+                                  <button
+                                    className="btn-icon save"
+                                    onClick={() => handleSaveEditNiveau(niv.id)}
+                                    title="Enregistrer"
+                                  >
+                                    <CheckIcon size={14} />
+                                  </button>
+                                  <button
+                                    className="btn-icon cancel"
+                                    onClick={() => setEditNiveauId(null)}
+                                    title="Annuler"
+                                  >
+                                    <CloseIcon size={14} />
+                                  </button>
+                                </div>
+                              </div>
+                            ) : (
+                              <>
+                                <div className="item-main">
+                                  <strong>{niv.nom}</strong>
+                                  <span className="badge-sub">
+                                    {niv.cycle || "Général"}
+                                  </span>
+                                </div>
+                                <div className="item-actions">
+                                  <span className="badge-item">
+                                    Ordre: {niv.ordre || 1}
+                                  </span>
+                                  <button
+                                    className="btn-icon edit"
+                                    onClick={() => handleStartEditNiveau(niv)}
+                                    title="Modifier"
+                                  >
+                                    <PencilIcon size={14} />
+                                  </button>
+                                  <button
+                                    className="btn-icon delete"
+                                    onClick={() => handleDeleteNiveau(niv.id)}
+                                    title="Supprimer"
+                                  >
+                                    <TrashIcon size={14} />
+                                  </button>
+                                </div>
+                              </>
+                            )}
                           </div>
                         ))}
                         {niveaux.length === 0 && (
@@ -898,7 +1122,6 @@ export default function DirectorDashboard({
                       </div>
                     </div>
 
-                    {/* Right Column: Classes Management */}
                     <div className="panel-card">
                       <div className="panel-header">
                         <h3>Gestion des Classes</h3>
@@ -944,15 +1167,107 @@ export default function DirectorDashboard({
                             "Inconnu";
                           return (
                             <div key={cls.id} className="list-item-row">
-                              <div className="item-main">
-                                <strong>{cls.nom}</strong>
-                                <span className="badge-sub">
-                                  Niveau: {levelName}
-                                </span>
-                              </div>
-                              <span className="badge-item">
-                                Année: {cls.anneeScolaire}
-                              </span>
+                              {editClasseId === cls.id ? (
+                                <div className="inline-edit-form">
+                                  <input
+                                    type="text"
+                                    value={editClasseForm.nom}
+                                    onChange={(e) =>
+                                      setEditClasseForm({
+                                        ...editClasseForm,
+                                        nom: e.target.value,
+                                      })
+                                    }
+                                    placeholder="Nom"
+                                  />
+                                  <select
+                                    value={editClasseForm.niveauId}
+                                    onChange={(e) =>
+                                      setEditClasseForm({
+                                        ...editClasseForm,
+                                        niveauId: e.target.value,
+                                      })
+                                    }
+                                  >
+                                    <option value="">Niveau</option>
+                                    {niveaux.map((n) => (
+                                      <option key={n.id} value={n.id}>
+                                        {n.nom}
+                                      </option>
+                                    ))}
+                                  </select>
+                                  <input
+                                    type="text"
+                                    value={editClasseForm.anneeScolaire}
+                                    onChange={(e) =>
+                                      setEditClasseForm({
+                                        ...editClasseForm,
+                                        anneeScolaire: e.target.value,
+                                      })
+                                    }
+                                    placeholder="Année"
+                                    style={{ width: 110 }}
+                                  />
+                                  <input
+                                    type="number"
+                                    value={editClasseForm.effectif}
+                                    onChange={(e) =>
+                                      setEditClasseForm({
+                                        ...editClasseForm,
+                                        effectif: Number(e.target.value),
+                                      })
+                                    }
+                                    placeholder="Effectif"
+                                    style={{ width: 80 }}
+                                  />
+                                  <div className="inline-edit-actions">
+                                    <button
+                                      className="btn-icon save"
+                                      onClick={() =>
+                                        handleSaveEditClasse(cls.id)
+                                      }
+                                      title="Enregistrer"
+                                    >
+                                      <CheckIcon size={14} />
+                                    </button>
+                                    <button
+                                      className="btn-icon cancel"
+                                      onClick={() => setEditClasseId(null)}
+                                      title="Annuler"
+                                    >
+                                      <CloseIcon size={14} />
+                                    </button>
+                                  </div>
+                                </div>
+                              ) : (
+                                <>
+                                  <div className="item-main">
+                                    <strong>{cls.nom}</strong>
+                                    <span className="badge-sub">
+                                      Niveau: {levelName}
+                                    </span>
+                                  </div>
+                                  <div className="item-actions">
+                                    <span className="badge-item">
+                                      Année: {cls.anneeScolaire}
+                                    </span>
+                                    <button
+                                      className="btn-icon edit"
+                                      onClick={() => handleStartEditClasse(cls)}
+                                      title="Modifier"
+                                    >
+                                      <PencilIcon size={14} />
+                                    </button>
+                                    <button
+                                      className="btn-icon delete"
+                                      onClick={() => handleDeleteClasse(cls.id)}
+                                      title="Supprimer"
+                                    >
+                                      <TrashIcon size={14} />
+                                    </button>
+                                  </div>
+                                </>
+                              )}
                             </div>
                           );
                         })}
@@ -967,7 +1282,6 @@ export default function DirectorDashboard({
                 </motion.div>
               )}
 
-              {/* ───────────────── VIEW: MATIERES ───────────────── */}
               {activeMenu === "matieres" && (
                 <motion.div
                   key="matieres"
@@ -1040,25 +1354,114 @@ export default function DirectorDashboard({
                           <th>Code</th>
                           <th>Nom de la matière</th>
                           <th>Coefficient</th>
+                          <th>Actions</th>
                         </tr>
                       </thead>
                       <tbody>
                         {matieres.map((m) => (
                           <tr key={m.id}>
-                            <td>
-                              <span className="code-badge">
-                                {m.code || "N/A"}
-                              </span>
-                            </td>
-                            <td>
-                              <strong>{m.nom}</strong>
-                            </td>
-                            <td>{m.coefficient}</td>
+                            {editMatiereId === m.id ? (
+                              <>
+                                <td>
+                                  <input
+                                    type="text"
+                                    value={editMatiereForm.code}
+                                    onChange={(e) =>
+                                      setEditMatiereForm({
+                                        ...editMatiereForm,
+                                        code: e.target.value,
+                                      })
+                                    }
+                                    placeholder="Code"
+                                    className="inline-input"
+                                  />
+                                </td>
+                                <td>
+                                  <input
+                                    type="text"
+                                    value={editMatiereForm.nom}
+                                    onChange={(e) =>
+                                      setEditMatiereForm({
+                                        ...editMatiereForm,
+                                        nom: e.target.value,
+                                      })
+                                    }
+                                    placeholder="Nom"
+                                    className="inline-input"
+                                  />
+                                </td>
+                                <td>
+                                  <input
+                                    type="number"
+                                    value={editMatiereForm.coefficient}
+                                    onChange={(e) =>
+                                      setEditMatiereForm({
+                                        ...editMatiereForm,
+                                        coefficient: Number(e.target.value),
+                                      })
+                                    }
+                                    min={1}
+                                    className="inline-input"
+                                    style={{ width: 70 }}
+                                  />
+                                </td>
+                                <td>
+                                  <div className="inline-edit-actions">
+                                    <button
+                                      className="btn-icon save"
+                                      onClick={() =>
+                                        handleSaveEditMatiere(m.id)
+                                      }
+                                      title="Enregistrer"
+                                    >
+                                      <CheckIcon size={14} />
+                                    </button>
+                                    <button
+                                      className="btn-icon cancel"
+                                      onClick={() => setEditMatiereId(null)}
+                                      title="Annuler"
+                                    >
+                                      <CloseIcon size={14} />
+                                    </button>
+                                  </div>
+                                </td>
+                              </>
+                            ) : (
+                              <>
+                                <td>
+                                  <span className="code-badge">
+                                    {m.code || "N/A"}
+                                  </span>
+                                </td>
+                                <td>
+                                  <strong>{m.nom}</strong>
+                                </td>
+                                <td>{m.coefficient}</td>
+                                <td>
+                                  <div className="inline-edit-actions">
+                                    <button
+                                      className="btn-icon edit"
+                                      onClick={() => handleStartEditMatiere(m)}
+                                      title="Modifier"
+                                    >
+                                      <PencilIcon size={14} />
+                                    </button>
+                                    <button
+                                      className="btn-icon delete"
+                                      onClick={() => handleDeleteMatiere(m.id)}
+                                      title="Supprimer"
+                                    >
+                                      <TrashIcon size={14} />
+                                    </button>
+                                  </div>
+                                </td>
+                              </>
+                            )}
                           </tr>
                         ))}
                         {matieres.length === 0 && (
                           <tr>
-                            <td colSpan={3} className="text-center">
+                            <td colSpan={4} className="text-center">
                               Aucune matière enregistrée.
                             </td>
                           </tr>
@@ -1069,7 +1472,6 @@ export default function DirectorDashboard({
                 </motion.div>
               )}
 
-              {/* ───────────────── VIEW: PERSONNEL ───────────────── */}
               {activeMenu === "personnel" && (
                 <motion.div
                   key="personnel"
@@ -1079,7 +1481,6 @@ export default function DirectorDashboard({
                   className="view-container"
                 >
                   <div className="grid-split-large">
-                    {/* Add Staff form */}
                     <div className="panel-card">
                       <div className="panel-header">
                         <h3>Ajouter un collaborateur</h3>
@@ -1162,7 +1563,6 @@ export default function DirectorDashboard({
                       </form>
                     </div>
 
-                    {/* Staff List */}
                     <div className="panel-card">
                       <div className="panel-header">
                         <h3>Membres du personnel</h3>
@@ -1193,7 +1593,6 @@ export default function DirectorDashboard({
                 </motion.div>
               )}
 
-              {/* ───────────────── VIEW: INSCRIPTIONS ───────────────── */}
               {activeMenu === "inscriptions" && (
                 <motion.div
                   key="inscriptions"
@@ -1203,7 +1602,6 @@ export default function DirectorDashboard({
                   className="view-container"
                 >
                   <div className="grid-split-large">
-                    {/* Admissions List */}
                     <div className="panel-card">
                       <div className="panel-header">
                         <h3>Demandes en attente de validation</h3>
@@ -1238,7 +1636,6 @@ export default function DirectorDashboard({
                       </div>
                     </div>
 
-                    {/* Details and validation panel */}
                     <div className="panel-card">
                       <div className="panel-header">
                         <h3>Détails de la demande</h3>
@@ -1320,7 +1717,6 @@ export default function DirectorDashboard({
                 </motion.div>
               )}
 
-              {/* ───────────────── VIEW: PARAMETRES ───────────────── */}
               {activeMenu === "parametres" && (
                 <motion.div
                   key="parametres"
@@ -1412,7 +1808,7 @@ export default function DirectorDashboard({
 
                     <div className="form-grid-two">
                       <div className="form-field">
-                        <label>Frais de première inscription (FCFA / €)</label>
+                        <label>Frais de première inscription (AR / €)</label>
                         <input
                           type="number"
                           value={etabForm.fraisInscription}
