@@ -1,4 +1,5 @@
 INSERT INTO utilisateur (
+  id,
     etablissement_id,
     email,
     mot_de_passe,
@@ -8,19 +9,32 @@ INSERT INTO utilisateur (
     role
 )
 VALUES (
+    uuid_generate_v4(),
     '27c53a32-14a3-4bf6-bf80-e84e503cde6d',
-    'secretaire@ecole.com',
+    'prof@gmail.com',
     'motdepasse',
-    'Rakoto',
-    'Marie',
+    'Jean',
+    'Dupont',
     '0341234567',
-    'SECRETAIRE'
+    'PROFESSEUR'
 );
 
 -- A modifier dans la migration prisma
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 ALTER TABLE utilisateur
 ALTER COLUMN id SET DEFAULT uuid_generate_v4();
+
+
+
+Insert into etablissement (id, nom, adresse, telephone, email, type)
+VALUES (
+  '27c53a32-14a3-4bf6-bf80-e84e503cde6d',
+  'Lycee Privee ABC',
+  '123 Rue de l Ecole, Antananarivo, Madagascar',
+  '0341234567',
+  'ecole@ecole.com',
+  'LYCEE'
+);
 
 INSERT INTO cours (id, professeur_id, classe_id, matiere_id, titre, contenu, type)
 VALUES (
