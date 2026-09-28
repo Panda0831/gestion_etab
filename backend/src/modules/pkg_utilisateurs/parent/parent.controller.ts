@@ -10,11 +10,13 @@ import {
 import { ParentService } from './parent.service';
 import { CreateParentDto } from './dto/create-parent.dto';
 import { UpdateParentDto } from './dto/update-parent.dto';
+import { Public } from '../../pkg_auth/decorators/public.decorator';
 
 @Controller('parent')
 export class ParentController {
   constructor(private readonly parentService: ParentService) {}
 
+  @Public()
   @Post()
   create(@Body() createParentDto: CreateParentDto) {
     return this.parentService.create(createParentDto);

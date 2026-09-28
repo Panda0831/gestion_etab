@@ -180,3 +180,17 @@ export const LogoutIcon = ({ size = 18, className }: IconProps) => (
     <line x1="21" y1="12" x2="9" y2="12" />
   </svg>
 );
+export const BriefcaseIcon = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <rect x="2" y="7" width="20" height="14" rx="2" ry="2" />
+    <path d="M16 21V11a4 4 0 0 0-8 0v10" />
+    <path d="M2 7h20" />
+  </svg>
+);
+
+export const MapPinIcon = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0Z" />
+    <circle cx="12" cy="10" r="3" />
+  </svg>
+);

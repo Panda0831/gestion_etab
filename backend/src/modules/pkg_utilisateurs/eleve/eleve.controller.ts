@@ -11,11 +11,13 @@ import {
 import { EleveService } from './eleve.service';
 import { CreateEleveDto } from './dto/create-eleve.dto';
 import { UpdateEleveDto } from './dto/update-eleve.dto';
+import { Public } from '../../pkg_auth/decorators/public.decorator';
 
 @Controller('eleve')
 export class EleveController {
   constructor(private readonly eleveService: EleveService) {}
 
+  @Public()
   @Post()
   create(@Body() createEleveDto: CreateEleveDto) {
     return this.eleveService.create(createEleveDto);

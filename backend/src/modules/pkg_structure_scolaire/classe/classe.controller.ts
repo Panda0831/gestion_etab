@@ -10,6 +10,7 @@ import {
 import { ClasseService } from './classe.service';
 import { CreateClasseDto } from './dto/create-classe.dto';
 import { UpdateClasseDto } from './dto/update-classe.dto';
+import { Public } from '../../pkg_auth/decorators/public.decorator';
 
 @Controller('classe')
 export class ClasseController {
@@ -20,6 +21,7 @@ export class ClasseController {
     return this.classeService.create(createClasseDto);
   }
 
+  @Public()
   @Get()
   findAll() {
     return this.classeService.findAll();
