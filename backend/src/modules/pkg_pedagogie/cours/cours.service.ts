@@ -1,14 +1,33 @@
-import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  ForbiddenException,
+  BadRequestException,
+} from '@nestjs/common';
+import { TypeMedia } from '@prisma/client';
+import { randomUUID } from 'crypto';
+import { extname } from 'path';
 import { PrismaService } from '../../../prisma/prisma.service';
+import { MinioService } from '../../../storage/minio.service'; // adapte le chemin
 import { CreateCourDto } from './dto/create-cour.dto';
 import { UpdateCourDto } from './dto/update-cour.dto';
 
 const PROFESSEUR_PUBLIC = { select: { id: true, nom: true, prenom: true } };
 const MEDIAS_PUBLIC = { select: { id: true, nomFichier: true, type: true, url: true } };
 
+const MEDIA_TYPES: [string, TypeMedia][] = [
+  ['image/', 'IMAGE'],
+  ['video/', 'VIDEO'],
+  ['audio/', 'AUDIO'],
+  ['application/pdf', 'PDF'],
+];
+
 @Injectable()
 export class CoursService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly minio: MinioService,
+  ) {}
 
   create(professeurId: string, dto: CreateCourDto) {
     return this.prisma.cours.create({ data: { ...dto, professeurId } });
@@ -36,9 +55,7 @@ export class CoursService {
         medias: MEDIAS_PUBLIC,
       },
     });
-    if (!item) {
-      throw new NotFoundException(`Cours avec ID ${id} non trouvé`);
-    }
+    if (!item) throw new NotFoundException(`Cours avec ID ${id} non trouvé`);
     return item;
   }
 
@@ -76,12 +93,40 @@ export class CoursService {
     });
   }
 
-  // Vérifie que le cours existe et appartient bien au professeur connecté
+  async addMedias(coursId: string, professeurId: string, files: Express.Multer.File[]) {
+    await this.assertOwner(coursId, professeurId);
+    if (!files?.length) throw new BadRequestException('Aucun fichier reçu');
+
+    // On valide tout avant d'envoyer quoi que ce soit
+    const items = files.map((file) => {
+      const type = MEDIA_TYPES.find(([prefix]) => file.mimetype.startsWith(prefix))?.[1];
+      if (!type) throw new BadRequestException(`Format non supporté : ${file.originalname}`);
+      return { file, type };
+    });
+
+    return Promise.all(
+      items.map(async ({ file, type }) => {
+        const key = `cours/${coursId}/${randomUUID()}${extname(file.originalname).toLowerCase()}`;
+        const url = await this.minio.upload(key, file);
+        return this.prisma.coursMedia.create({
+          data: {
+            coursId,
+            // Multer décode les noms UTF-8 en latin1 : on corrige les accents
+            nomFichier: Buffer.from(file.originalname, 'latin1').toString('utf8'),
+            type,
+            url,
+            taille: BigInt(file.size),
+          },
+          select: { id: true, nomFichier: true, type: true, url: true }, // sans taille (BigInt)
+        });
+      }),
+    );
+  }
+
+  // Vérifie que le cours existe et appartient au professeur connecté
   private async assertOwner(id: string, professeurId: string) {
     const cours = await this.prisma.cours.findUnique({ where: { id } });
-    if (!cours) {
-      throw new NotFoundException(`Cours avec ID ${id} non trouvé`);
-    }
+    if (!cours) throw new NotFoundException(`Cours avec ID ${id} non trouvé`);
     if (cours.professeurId !== professeurId) {
       throw new ForbiddenException("Vous n'êtes pas l'auteur de ce cours");
     }

@@ -2,8 +2,9 @@ import { useState, useEffect, FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Classe, Matiere } from "../../types/structure";
-import { getClasses, getMatieres, createCours } from "../../services/pedagogieService";
+import { getClasses, getMatieres, createCours, uploadMedias } from "../../services/pedagogieService";
 import Combobox from "../../components/Combobox";
+import FilePicker from "../../components/FilePicker";
 import "./CoursEleve.css";
 import "./NouveauCours.css";
 
@@ -25,7 +26,9 @@ export default function NouveauCours() {
   const [titre, setTitre] = useState("");
   const [contenu, setContenu] = useState("");
   const [type, setType] = useState<(typeof TYPES)[number]>("COURS");
+  const [files, setFiles] = useState<File[]>([]);
 
+  const [coursId, setCoursId] = useState<string | null>(null); // rempli dès que le cours est créé
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -41,22 +44,40 @@ export default function NouveauCours() {
 
   const onSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    if (!classe || !matiere) return setError("Choisissez une classe et une matière dans la liste.");
-    if (!titre.trim()) return setError("Le titre est obligatoire.");
+    if (!coursId) {
+      if (!classe || !matiere) return setError("Choisissez une classe et une matière dans la liste.");
+      if (!titre.trim()) return setError("Le titre est obligatoire.");
+    }
 
     setSubmitting(true);
     setError(null);
+
+    let id = coursId;
     try {
-      await createCours({
-        classeId: classe.id,
-        matiereId: matiere.id,
-        titre: titre.trim(),
-        contenu: contenu.trim() || undefined,
-        type,
-      });
+      // 1. création du cours (sautée si elle a déjà réussi lors d'un essai précédent)
+      if (!id) {
+        const created = await createCours({
+          classeId: classe!.id,
+          matiereId: matiere!.id,
+          titre: titre.trim(),
+          contenu: contenu.trim() || undefined,
+          type,
+        });
+        id = created.id;
+        setCoursId(id);
+      }
+
+      // 2. envoi des fichiers
+      if (files.length > 0) await uploadMedias(id, files);
+
       navigate("/coursProf");
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Échec de la création du cours.");
+      const msg = err instanceof Error ? err.message : "Échec de la publication.";
+      setError(
+        id
+          ? `Le cours est créé, mais l'envoi des fichiers a échoué : ${msg}. Cliquez sur « Publier » pour réessayer.`
+          : msg,
+      );
       setSubmitting(false);
     }
   };
@@ -128,10 +149,12 @@ export default function NouveauCours() {
           />
         </div>
 
+        <FilePicker files={files} onChange={setFiles} disabled={submitting} />
+
         {error && <p className="form-error">{error}</p>}
 
         <div className="form-actions">
-          <button type="button" className="cours-chip" onClick={() => navigate("/cours")}>
+          <button type="button" className="cours-chip" onClick={() => navigate("/coursProf")}>
             Annuler
           </button>
           <button type="submit" className="cours-chip active" disabled={submitting}>

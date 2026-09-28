@@ -11,3 +11,14 @@
 .combo-item small { color: #64748b; }
 .combo-item.active { background: #eef2ff; }
 .combo-empty { padding: 0.6rem 0.65rem; color: #64748b; font-size: 0.875rem; }
+.file-drop { display: flex; flex-direction: column; align-items: center; gap: 0.25rem; padding: 1.25rem; border: 2px dashed #cbd5e1; border-radius: 12px; color: #475569; cursor: pointer; text-align: center; }
+.file-drop p { margin: 0; }
+.file-drop span { color: var(--primary); font-weight: 600; }
+.file-drop small { color: #94a3b8; }
+.file-drop:hover, .file-drop.drag { border-color: var(--primary); background: #f8faff; }
+
+.file-list { list-style: none; margin: 0.75rem 0 0; padding: 0; display: flex; flex-direction: column; gap: 0.4rem; }
+.file-item { display: flex; align-items: center; gap: 0.6rem; padding: 0.5rem 0.7rem; border: 1px solid #e2e8f0; border-radius: 10px; }
+.file-item-name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.file-item small { color: #64748b; }
+.file-remove { border: none; background: none; cursor: pointer; color: #ef4444; }

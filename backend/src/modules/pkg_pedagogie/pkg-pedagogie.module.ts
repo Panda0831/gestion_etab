@@ -7,6 +7,8 @@ import { CoursService } from './cours/cours.service';
 import { CoursMediaController } from './cours-media/cours-media.controller';
 import { CoursMediaService } from './cours-media/cours-media.service';
 
+import { MinioService } from '../../storage/minio.service';
+
 import { EvaluationController } from './evaluation/evaluation.controller';
 import { EvaluationService } from './evaluation/evaluation.service';
 
@@ -35,6 +37,7 @@ import { ParametreNotationService } from './parametre-notation/parametre-notatio
   providers: [
     CoursService,
     CoursMediaService,
+    MinioService,
     EvaluationService,
     NoteService,
     BulletinService,

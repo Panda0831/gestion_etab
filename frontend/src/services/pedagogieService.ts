@@ -1,4 +1,4 @@
-import { get, post } from "./api";
+import { get, post, upload } from "./api";
 import { Cours } from "../types/cours";
 import { Classe, Matiere } from "../types/structure";
 
@@ -19,3 +19,9 @@ export const createCours = (payload: {
   contenu?: string;
   type: "COURS" | "TD" | "TP";
 }) => post<typeof payload, Cours>("/cours", payload);
+
+export const uploadMedias = (coursId: string, files: File[]) => {
+  const fd = new FormData();
+  files.forEach((f) => fd.append("files", f)); // "files" = nom attendu par FilesInterceptor
+  return upload<CoursMedia[]>(`/cours/${coursId}/medias`, fd);
+};
