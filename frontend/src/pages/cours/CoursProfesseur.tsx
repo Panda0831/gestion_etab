@@ -5,6 +5,7 @@ import { Cours } from "../../types/cours";
 import { getCoursByProfesseur } from "../../services/pedagogieService";
 import MediaViewer from "../../components/MediaViewer";
 import "./CoursEleve.css";
+import { Link } from "react-router-dom";
 
 interface CoursProfesseurProps {
   user: User;
@@ -84,12 +85,15 @@ export default function CoursProfesseur({ user }: CoursProfesseurProps) {
   return (
     <motion.div className="cours-page" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
       <header className="cours-header">
-        <h1>Mes cours publiés</h1>
+        <h1>Mes cours publiés</h1> 
+        <Link to="/coursProf/Nouveau">Créer un nouveau cours</Link>
+
         <p>
           {coursAnnee.length} cours
           {anneeActive !== ALL && ` · ${anneeActive}`}
         </p>
       </header>
+      
 
       {/* Filtre année scolaire */}
       {annees.length > 0 && (

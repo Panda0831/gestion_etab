@@ -1,0 +1,13 @@
+.cours-form { display: flex; flex-direction: column; gap: 1.25rem; max-width: 640px; }
+.form-label { display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 0.35rem; }
+.form-input { width: 100%; padding: 0.6rem 0.8rem; border: 1px solid #e2e8f0; border-radius: 10px; font: inherit; box-sizing: border-box; }
+.form-input:focus { outline: 2px solid var(--primary); outline-offset: -1px; }
+.form-error { color: #ef4444; font-size: 0.875rem; margin: 0; }
+.form-actions { display: flex; justify-content: flex-end; gap: 0.5rem; }
+
+.combo { position: relative; }
+.combo-list { position: absolute; z-index: 20; top: 100%; left: 0; right: 0; margin: 0.25rem 0 0; padding: 0.25rem; list-style: none; background: #fff; border: 1px solid #e2e8f0; border-radius: 10px; box-shadow: 0 8px 24px rgba(15, 23, 42, 0.12); max-height: 240px; overflow-y: auto; }
+.combo-item { display: flex; flex-direction: column; padding: 0.5rem 0.65rem; border-radius: 8px; cursor: pointer; }
+.combo-item small { color: #64748b; }
+.combo-item.active { background: #eef2ff; }
+.combo-empty { padding: 0.6rem 0.65rem; color: #64748b; font-size: 0.875rem; }
