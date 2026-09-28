@@ -52,4 +52,18 @@ export class CoursService {
     await this.findOne(id);
     return this.prisma.cours.delete({ where: { id } });
   }
+
+  async findCoursByClasseId(classeId: string) {
+    return this.prisma.cours.findMany({
+      where: { classeId },
+      include: {
+        matiere: true,
+        professeur: { select: { nom: true, prenom: true } },
+        medias: {
+          select: { id: true, nomFichier: true, type: true, url: true },
+        },
+      },
+      orderBy: { datePublication: "desc" },
+    });
+  }
 }

@@ -1,0 +1,24 @@
+.cours-page { padding: 6rem 1.5rem 2rem; max-width: 1100px; margin: 0 auto; }
+.cours-header p, .cours-meta { color: #64748b; font-size: 0.875rem; margin: 0.25rem 0; }
+
+.cours-matieres { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 1.5rem 0; }
+.cours-chip { padding: 0.4rem 0.9rem; border-radius: 999px; border: 1px solid #e2e8f0; background: #fff; cursor: pointer; }
+.cours-chip.active { background: var(--primary); color: #fff; border-color: var(--primary); }
+
+.cours-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 1rem; }
+.cours-card { text-align: left; padding: 1rem; border: 1px solid #e2e8f0; border-radius: 12px; background: #fff; cursor: pointer; }
+.cours-card h3 { margin: 0.5rem 0 0.25rem; }
+
+.cours-badge { font-size: 0.7rem; font-weight: 600; padding: 0.15rem 0.5rem; border-radius: 6px; background: #eef2ff; color: #4338ca; }
+.cours-badge.td { background: #ecfdf5; color: #047857; }
+.cours-badge.tp { background: #fff7ed; color: #c2410c; }
+
+.cours-overlay { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.5); display: flex; align-items: center; justify-content: center; padding: 1rem; z-index: 100; }
+.cours-modal { position: relative; background: #fff; border-radius: 16px; padding: 1.5rem; width: 100%; max-width: 720px; max-height: 85vh; overflow-y: auto; }
+.cours-close { position: absolute; top: 1rem; right: 1rem; border: none; background: none; cursor: pointer; font-size: 1.1rem; }
+.cours-contenu { white-space: pre-wrap; margin: 1rem 0; line-height: 1.6; }
+.cours-medias { display: flex; flex-direction: column; gap: 0.75rem; }
+.cours-media-player, .cours-media-image { max-width: 100%; border-radius: 8px; }
+.cours-media-link { color: var(--primary); }
+.cours-modal-top { display: flex; align-items: center; gap: 0.75rem; }
+.cours-prof { color: #475569; font-size: 0.875rem; font-weight: 500; float: right; padding-right: 50px;}

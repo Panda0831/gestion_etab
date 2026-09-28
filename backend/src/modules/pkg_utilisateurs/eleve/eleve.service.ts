@@ -79,7 +79,7 @@ export class EleveService {
     return this.prisma.eleve.delete({ where: { id } });
   }
 
-   async findByUserId(userId: string) {
+  async findByUserId(userId: string) {
     const eleve = await this.prisma.eleve.findUnique({
       where: { utilisateurId: userId },
       include: { classe: { include: { niveau: true } } },
