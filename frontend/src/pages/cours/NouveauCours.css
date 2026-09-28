@@ -22,3 +22,5 @@
 .file-item-name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .file-item small { color: #64748b; }
 .file-remove { border: none; background: none; cursor: pointer; color: #ef4444; }
+.file-item { align-items: flex-start; }
+.file-item .cours-media-player, .file-item .cours-media-image { max-width: 200px; max-height: 120px; }

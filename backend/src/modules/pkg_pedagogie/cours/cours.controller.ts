@@ -56,11 +56,16 @@ export class CoursController {
 
   @Patch(':id')
   update(@Req() req: any, @Param('id') id: string, @Body() updateCourDto: UpdateCourDto) {
-    return this.coursService.update(id, req.user.id, updateCourDto);
+    return this.coursService.update(id, req.user.sub, updateCourDto);
   }
 
   @Delete(':id')
   remove(@Req() req: any, @Param('id') id: string) {
-    return this.coursService.remove(id, req.user.id);
+    return this.coursService.remove(id, req.user.sub);
+  }
+
+  @Delete(':id/medias/:mediaId')
+  removeMedia(@Req() req: any, @Param('id') id: string, @Param('mediaId') mediaId: string) {
+    return this.coursService.removeMedia(id, mediaId, req.user.sub);
   }
 }

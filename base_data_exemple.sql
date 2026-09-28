@@ -11,12 +11,27 @@ INSERT INTO utilisateur (
 VALUES (
     uuid_generate_v4(),
     '27c53a32-14a3-4bf6-bf80-e84e503cde6d',
-    'prof@gmail.com',
+    'parent@gmail.com',
     'motdepasse',
-    'Jean',
-    'Dupont',
+    'Parent',
+    'P',
     '0341234567',
-    'PROFESSEUR'
+    'PARENT'
+);
+
+insert into parent( id, utilisateur_id, profession) values ( uuid_generate_v4(), (select id from utilisateur where email = 'parent@gmail.com'), 'Ingenieur' );
+insert into eleve(
+  id, utilisateur_id, classe_id, parent_id, matricule, date_naissance, lieu_naissance, sexe, statut_inscription
+) values (
+  uuid_generate_v4(),
+  (select id from utilisateur where email = 'eleve@gmail.com'),
+  (select id from classe where nom = 'Terminal A'),
+  (select id from parent where utilisateur_id = (select id from utilisateur where email = 'parent@gmail.com')),
+  'MAT001',
+  '2010-01-01',
+  'Antananarivo',
+  'M',
+  'INSCRIT'
 );
 
 -- A modifier dans la migration prisma

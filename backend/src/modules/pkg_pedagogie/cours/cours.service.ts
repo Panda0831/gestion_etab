@@ -123,13 +123,27 @@ export class CoursService {
     );
   }
 
+  async removeMedia(coursId: string, mediaId: string, professeurId: string) {
+    await this.assertOwner(coursId, professeurId);
+    const media = await this.prisma.coursMedia.findUnique({ where: { id: mediaId } });
+    if (!media || media.coursId !== coursId) {
+      throw new NotFoundException('Média introuvable pour ce cours');
+    }
+    await this.minio.deleteByUrl(media.url);
+    await this.prisma.coursMedia.delete({ where: { id: mediaId } });
+    return { deleted: true };
+  }
+
   // Vérifie que le cours existe et appartient au professeur connecté
   private async assertOwner(id: string, professeurId: string) {
     const cours = await this.prisma.cours.findUnique({ where: { id } });
     if (!cours) throw new NotFoundException(`Cours avec ID ${id} non trouvé`);
     if (cours.professeurId !== professeurId) {
+      console.log(`Cours ${id} appartient à ${cours.professeurId}, pas à ${professeurId}`);
       throw new ForbiddenException("Vous n'êtes pas l'auteur de ce cours");
     }
     return cours;
   }
+
+
 }

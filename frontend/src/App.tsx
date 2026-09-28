@@ -97,6 +97,16 @@ function AnimatedRoutes({
             )
           }
         />
+        <Route
+          path="/coursProf/:id/modifier"
+          element={
+            user?.role === "PROFESSEUR" ? (
+              <NouveauCours user={user} />
+            ) : (
+              <Home user={user} />
+            )
+          }
+        />
       </Routes>
     </AnimatePresence>
   );

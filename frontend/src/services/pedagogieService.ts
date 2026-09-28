@@ -1,4 +1,4 @@
-import { get, post, upload } from "./api";
+import { del, get, patch, post, upload } from "./api";
 import { Cours } from "../types/cours";
 import { Classe, Matiere } from "../types/structure";
 
@@ -25,3 +25,14 @@ export const uploadMedias = (coursId: string, files: File[]) => {
   files.forEach((f) => fd.append("files", f)); // "files" = nom attendu par FilesInterceptor
   return upload<CoursMedia[]>(`/cours/${coursId}/medias`, fd);
 };
+
+export const getCoursById = (id: string) => get<Cours>(`/cours/${id}`);
+
+export const updateCours = (
+  id: string,
+  payload: Partial<{ classeId: string; matiereId: string; titre: string; contenu?: string; type: string }>,
+) => patch<typeof payload, Cours>(`/cours/${id}`, payload);
+
+export const deleteCours = (id: string) => del<void>(`/cours/${id}`);
+
+export const deleteMedia = (coursId: string, mediaId: string) => del<void>(`/cours/${coursId}/medias/${mediaId}`);

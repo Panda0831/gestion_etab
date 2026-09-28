@@ -1,11 +1,11 @@
 import { useState, useEffect, useMemo } from "react";
+import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { User } from "../../types/auth";
 import { Cours } from "../../types/cours";
-import { getCoursByProfesseur } from "../../services/pedagogieService";
+import { getCoursByProfesseur, deleteCours } from "../../services/pedagogieService";
 import MediaViewer from "../../components/MediaViewer";
 import "./CoursEleve.css";
-import { Link } from "react-router-dom";
 
 interface CoursProfesseurProps {
   user: User;
@@ -21,10 +21,12 @@ const classeLabel = (c: Cours, withAnnee = false) => {
 };
 
 export default function CoursProfesseur({ user }: CoursProfesseurProps) {
+  const navigate = useNavigate();
+
   const [cours, setCours] = useState<Cours[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [annee, setAnnee] = useState<string | null>(null); // null = pas encore choisi
+  const [annee, setAnnee] = useState<string | null>(null);
   const [classeId, setClasseId] = useState<string | null>(null);
   const [selected, setSelected] = useState<Cours | null>(null);
 
@@ -41,14 +43,12 @@ export default function CoursProfesseur({ user }: CoursProfesseurProps) {
     };
   }, [user.id]);
 
-  // Années scolaires distinctes, la plus récente d'abord
   const annees = useMemo(() => {
     const set = new Set<string>();
     cours.forEach((c) => c.classe && set.add(c.classe.anneeScolaire));
     return [...set].sort().reverse();
   }, [cours]);
 
-  // Par défaut : l'année la plus récente
   const anneeActive = annee ?? annees[0] ?? ALL;
 
   const coursAnnee = useMemo(
@@ -56,14 +56,13 @@ export default function CoursProfesseur({ user }: CoursProfesseurProps) {
     [cours, anneeActive],
   );
 
-  // Classes distinctes de l'année choisie
   const classes = useMemo(() => {
     const map = new Map<string, { id: string; label: string; count: number }>();
     coursAnnee.forEach((c) => {
       if (!c.classe) return;
       const k = map.get(c.classe.id) ?? {
         id: c.classe.id,
-        label: classeLabel(c, anneeActive === ALL), // année affichée seulement si on mélange les années
+        label: classeLabel(c, anneeActive === ALL),
         count: 0,
       };
       k.count++;
@@ -76,7 +75,18 @@ export default function CoursProfesseur({ user }: CoursProfesseurProps) {
 
   const changeAnnee = (a: string) => {
     setAnnee(a);
-    setClasseId(null); // la classe sélectionnée n'existe peut-être pas dans cette année
+    setClasseId(null);
+  };
+
+  const onDelete = async (c: Cours) => {
+    if (!confirm(`Supprimer « ${c.titre} » ? Cette action est définitive.`)) return;
+    try {
+      await deleteCours(c.id);
+      setCours((prev) => prev.filter((x) => x.id !== c.id));
+      setSelected(null);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Échec de la suppression.");
+    }
   };
 
   if (loading) return <p>Chargement...</p>;
@@ -85,17 +95,16 @@ export default function CoursProfesseur({ user }: CoursProfesseurProps) {
   return (
     <motion.div className="cours-page" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
       <header className="cours-header">
-        <h1>Mes cours publiés</h1> 
-        <Link to="/coursProf/Nouveau">Créer un nouveau cours</Link>
-
+        <h1>Mes cours publiés</h1>
         <p>
           {coursAnnee.length} cours
           {anneeActive !== ALL && ` · ${anneeActive}`}
         </p>
+        <button className="cours-chip active" onClick={() => navigate("/cours/nouveau")}>
+          + Nouveau cours
+        </button>
       </header>
-      
 
-      {/* Filtre année scolaire */}
       {annees.length > 0 && (
         <div className="cours-matieres">
           {annees.map((a) => (
@@ -118,7 +127,6 @@ export default function CoursProfesseur({ user }: CoursProfesseurProps) {
         </div>
       )}
 
-      {/* Filtre classe */}
       <div className="cours-matieres">
         <button className={`cours-chip ${classeId === null ? "active" : ""}`} onClick={() => setClasseId(null)}>
           Toutes les classes ({coursAnnee.length})
@@ -176,6 +184,16 @@ export default function CoursProfesseur({ user }: CoursProfesseurProps) {
               onClick={(e) => e.stopPropagation()}
             >
               <button className="cours-close" onClick={() => setSelected(null)} aria-label="Fermer">✕</button>
+
+              <div className="cours-modal-actions">
+                <button className="cours-chip" onClick={() => navigate(`/coursProf/${selected.id}/modifier`)}>
+                  Modifier
+                </button>
+                <button className="cours-chip danger" onClick={() => onDelete(selected)}>
+                  Supprimer
+                </button>
+              </div>
+
               <div className="cours-modal-top">
                 <span className={`cours-badge ${selected.type.toLowerCase()}`}>{selected.type}</span>
                 <span className="cours-prof">{classeLabel(selected, true)}</span>

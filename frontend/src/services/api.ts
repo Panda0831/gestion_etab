@@ -56,3 +56,19 @@ export async function upload<TResponse>(endpoint: string, formData: FormData): P
   }
   return data as TResponse;
 }
+
+export async function del<TResponse>(endpoint: string, requiresAuth: boolean = true): Promise<TResponse> {
+  const headers: HeadersInit = {};
+  if (requiresAuth) {
+    const token = localStorage.getItem("token");
+    if (!token) throw new Error("Authentification requise. Veuillez vous connecter.");
+    headers["Authorization"] = `Bearer ${token}`;
+  }
+  const res = await fetch(`${API_URL}${endpoint}`, { method: "DELETE", headers });
+  const data = res.status === 204 ? null : await res.json();
+  if (!res.ok) {
+    if (res.status === 401) localStorage.removeItem("token");
+    throw new Error(data?.message || `Erreur ${res.status}`);
+  }
+  return data as TResponse;
+}
