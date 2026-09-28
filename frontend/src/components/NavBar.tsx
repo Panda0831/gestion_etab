@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { motion, AnimatePresence, useMotionValueEvent, useScroll } from "framer-motion";
 import { User } from "../types/auth";
@@ -55,11 +55,13 @@ interface NavLink {
   to: string;
   label: string;
   icon: (active: boolean) => React.ReactNode;
+  roles?: string[];
 }
 
 const navLinks: NavLink[] = [
   { to: "/", label: "Accueil", icon: (a) => <HomeIcon active={a} /> },
-  { to: "/eleves", label: "Élèves", icon: (a) => <UsersIcon active={a} /> },
+  { to: "/eleves", label: "Élèves", icon: (a) => <UsersIcon active={a} />, roles: ["ELEVE", "PROFESSEUR"] },
+  { to: "/cours", label: "Cours", icon: (a) => <UsersIcon active={a} />, roles: ["ELEVE", "PROFESSEUR"] },
   { to: "/emploi-du-temps", label: "Emploi du temps", icon: (a) => <CalendarNavIcon active={a} /> },
   { to: "/parametres", label: "Paramètres", icon: (a) => <SettingsIcon active={a} /> },
 ];
@@ -99,6 +101,11 @@ function Navbar({ user, onLogout }: NavbarProps) {
     return location.pathname.startsWith(path);
   };
 
+  const visibleLinks = useMemo(
+  () => navLinks.filter((link) => !link.roles || (user && link.roles.includes(user.role))),
+  [user],
+);
+
   return (
     <>
       <motion.nav
@@ -137,7 +144,7 @@ function Navbar({ user, onLogout }: NavbarProps) {
           {/* ── Desktop Links ── */}
           {user && (
             <div className="scroll-nav-links">
-              {navLinks.map((link) => {
+              {visibleLinks.map((link) => {
                 const active = isActive(link.to);
                 return (
                   <Link key={link.to} to={link.to} className={`scroll-nav-link ${active ? "active" : ""}`}>
@@ -240,7 +247,7 @@ function Navbar({ user, onLogout }: NavbarProps) {
               </div>
 
               <div className="scroll-nav-mobile-links">
-                {navLinks.map((link, i) => {
+                {visibleLinks.map((link, i) => {
                   const active = isActive(link.to);
                   return (
                     <motion.div

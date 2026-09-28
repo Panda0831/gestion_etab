@@ -78,4 +78,13 @@ export class EleveService {
     await this.findOne(id);
     return this.prisma.eleve.delete({ where: { id } });
   }
+
+   async findByUserId(userId: string) {
+    const eleve = await this.prisma.eleve.findUnique({
+      where: { utilisateurId: userId },
+      include: { classe: { include: { niveau: true } } },
+    });
+    if (!eleve) throw new NotFoundException(`Aucun élève pour l'utilisateur ${userId}`);
+    return eleve;
+  }
 }

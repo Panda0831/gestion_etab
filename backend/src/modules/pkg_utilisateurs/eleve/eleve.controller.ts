@@ -52,4 +52,9 @@ export class EleveController {
   remove(@Param('id') id: string) {
     return this.eleveService.remove(id);
   }
+
+  @Get("user/:userId")
+  findByUserId(@Param("userId") userId: string) {
+    return this.eleveService.findByUserId(userId);
+  }
 }
