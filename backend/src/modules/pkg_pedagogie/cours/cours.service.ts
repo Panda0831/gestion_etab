@@ -53,6 +53,18 @@ export class CoursService {
     return this.prisma.cours.delete({ where: { id } });
   }
 
+  async findByProfesseur(professeurId: string) {
+    return this.prisma.cours.findMany({
+      where: { professeurId },
+      include: {
+        matiere: true,
+        classe: { include: { niveau: true } },
+        medias: { select: { id: true, nomFichier: true, type: true, url: true } },
+      },
+      orderBy: { datePublication: "desc" },
+    });
+  }
+
   async findCoursByClasseId(classeId: string) {
     return this.prisma.cours.findMany({
       where: { classeId },
@@ -66,4 +78,6 @@ export class CoursService {
       orderBy: { datePublication: "desc" },
     });
   }
+
+  
 }

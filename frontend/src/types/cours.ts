@@ -1,4 +1,4 @@
-import { Matiere } from "./structure";
+import { Matiere, Classe } from "./structure";
 
 export interface CoursMedia {
   id: string;
@@ -15,6 +15,7 @@ export interface Cours {
   type: "COURS" | "TD" | "TP";
   datePublication: string;
   matiere: Matiere;
-  professeur: { nom: string; prenom: string };
+  professeur?: { nom: string; prenom: string };
+  classe?: Classe;
   medias: CoursMedia[];
 }

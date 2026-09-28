@@ -40,6 +40,11 @@ export class CoursController {
     return this.coursService.remove(id);
   }
 
+  @Get("professeur/:professeurId")
+  findByProfesseur(@Param("professeurId") professeurId: string) {
+    return this.coursService.findByProfesseur(professeurId);
+  }
+
   @Get('classe/:classeId')
   findByClasseId(@Param('classeId') classeId: string) {
     return this.coursService.findCoursByClasseId(classeId);

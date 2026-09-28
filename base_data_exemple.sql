@@ -26,10 +26,10 @@ INSERT INTO cours (id, professeur_id, classe_id, matiere_id, titre, contenu, typ
 VALUES (
   uuid_generate_v4(),
   (SELECT id FROM utilisateur WHERE role = 'PROFESSEUR' LIMIT 1),
-  (SELECT id FROM classe WHERE nom = 'Terminale A' LIMIT 1),
+  (SELECT id FROM classe WHERE nom = 'Terminal A' LIMIT 1),
   (SELECT id FROM matiere WHERE code = 'FR' LIMIT 1),
-  'Les verbes irréguliers',
-  'Un verbe irrégulier est un verbe dont la conjugaison ne suit pas les règles générales...',
+  'Les fractions',
+  'Les fractions sont des nombres qui représentent une partie d\un tout. Elles sont composées d\un numérateur et d\un dénominateur, séparés par une barre de fraction. Par exemple, 1/2 représente une moitié, tandis que 3/4 représente trois quarts.',
   'COURS'
 );
 

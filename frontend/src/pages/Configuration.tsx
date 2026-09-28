@@ -49,7 +49,7 @@ export default function Configuration({ user }: ConfigurationProps) {
   // Form states - New Class
   const [newClass, setNewClass] = useState({
     nom: "",
-    anneeScolaire: "2026-2027",
+    anneeScolaire: "2025-2026",
     effectif: 0,
   });
   // Form states - New Subject

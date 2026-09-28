@@ -5,28 +5,12 @@ import { Classe } from "../../types/structure";
 import { Cours, CoursMedia } from "../../types/cours";
 import { getEleveByUserId } from "../../services/eleveService";
 import { getCoursByClasse } from "../../services/pedagogieService";
+import MediaViewer from "../../components/MediaViewer";
 import "./CoursEleve.css";
 
 interface CoursEleveProps {
   user: User;
   onLogout?: () => void;
-}
-
-function MediaViewer({ media }: { media: CoursMedia }) {
-  switch (media.type) {
-    case "VIDEO":
-      return <video src={media.url} controls className="cours-media-player" />;
-    case "AUDIO":
-      return <audio src={media.url} controls />;
-    case "IMAGE":
-      return <img src={media.url} alt={media.nomFichier} className="cours-media-image" />;
-    default:
-      return (
-        <a href={media.url} target="_blank" rel="noreferrer" className="cours-media-link">
-          📄 {media.nomFichier}
-        </a>
-      );
-  }
 }
 
 export default function CoursEleve({ user }: CoursEleveProps) {

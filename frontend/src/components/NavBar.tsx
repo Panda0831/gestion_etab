@@ -61,7 +61,8 @@ interface NavLink {
 const navLinks: NavLink[] = [
   { to: "/", label: "Accueil", icon: (a) => <HomeIcon active={a} /> },
   { to: "/eleves", label: "Élèves", icon: (a) => <UsersIcon active={a} />, roles: ["ELEVE", "PROFESSEUR"] },
-  { to: "/cours", label: "Cours", icon: (a) => <UsersIcon active={a} />, roles: ["ELEVE", "PROFESSEUR"] },
+  { to: "/cours", label: "Cours", icon: (a) => <UsersIcon active={a} />, roles: ["ELEVE"] },
+  { to: "/coursProf", label: "Cours", icon: (a) => <UsersIcon active={a} />, roles: ["PROFESSEUR"] },
   { to: "/emploi-du-temps", label: "Emploi du temps", icon: (a) => <CalendarNavIcon active={a} /> },
   { to: "/parametres", label: "Paramètres", icon: (a) => <SettingsIcon active={a} /> },
 ];

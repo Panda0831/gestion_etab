@@ -8,6 +8,7 @@ import Inscription from "./pages/Inscription";
 import Configuration from "./pages/Configuration";
 import DirectorDashboard from "./pages/director/DirectorDashboard";
 import CoursEleve from "./pages/cours/CoursEleve";  
+import CoursProfesseur from "./pages/cours/CoursProfesseur";  
 import { User } from "./types/auth";
 import "./App.css";
 import ListeEleves from "./pages/ListEleve";
@@ -70,6 +71,16 @@ function AnimatedRoutes({
           element={
             user?.role === "ELEVE" ? (
               <CoursEleve user={user} />
+            ) : (
+              <Home user={user} />
+            )
+          }
+        />
+        <Route
+          path="/coursProf"
+          element={
+            user?.role === "PROFESSEUR" ? (
+              <CoursProfesseur user={user} />
             ) : (
               <Home user={user} />
             )
