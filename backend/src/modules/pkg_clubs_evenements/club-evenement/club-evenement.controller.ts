@@ -5,14 +5,12 @@ import { ClubEvenementService } from './club-evenement.service';
 import { CreateClubEvenementDto } from './dto/create-club-evenement.dto';
 import { UpdateClubEvenementDto } from './dto/update-club-evenement.dto';
 import { UpdateStatutClubDto } from './dto/update-statut-club.dto';
-// import { JwtAuthGuard } from '...'; // ton guard existant
 
 const secretaireSeulement = (req) => {
   if (req.user.role !== 'SECRETAIRE') throw new ForbiddenException();
 };
 
 @Controller('club-evenement')
-// @UseGuards(JwtAuthGuard)
 export class ClubEvenementController {
   constructor(private readonly clubEvenementService: ClubEvenementService) {}
 
@@ -22,8 +20,11 @@ export class ClubEvenementController {
   }
 
   @Get()
-  findAll(@Req() req) {
-    return this.clubEvenementService.findAll(req.user.etablissementId);
+  findAll(
+    @Req() req,
+    @Query('type') type?: 'CLUB' | 'EVENEMENT',
+  ) {
+    return this.clubEvenementService.findAll(req.user.etablissementId, type);
   }
 
   // Doit rester avant @Get(':id')
@@ -31,6 +32,15 @@ export class ClubEvenementController {
   findDemandes(@Req() req) {
     secretaireSeulement(req);
     return this.clubEvenementService.findDemandes(req.user.etablissementId);
+  }
+
+  // Doit rester avant @Get(':id')
+  @Get('utilisateur/:utilisateurId')
+  findByUtilisateur(
+    @Param('utilisateurId') utilisateurId: string,
+    @Query('type') type: 'CLUB' | 'EVENEMENT',
+  ) {
+    return this.clubEvenementService.findByUtilisateur(utilisateurId, type);
   }
 
   @Get(':id')
@@ -52,13 +62,5 @@ export class ClubEvenementController {
   @Delete(':id')
   remove(@Param('id') id: string, @Req() req) {
     return this.clubEvenementService.remove(id, req.user.etablissementId);
-  }
-
-  @Get('utilisateur/:utilisateurId')
-  findByUtilisateur(
-    @Param('utilisateurId') utilisateurId: string,
-    @Query('type') type: 'CLUB' | 'EVENEMENT',
-  ) {
-    return this.clubEvenementService.findByUtilisateur(utilisateurId, type);
   }
 }

@@ -24,10 +24,13 @@ export class ClubEvenementService {
     });
   }
 
-  findAll(etablissementId: string) {
+  findAll(etablissementId: string, type?: 'CLUB' | 'EVENEMENT') {
     return this.prisma.clubEvenement.findMany({
-      where: { etablissementId },
-      include,
+      where: {
+        etablissementId, // Filtre obligatoire par établissement
+        ...(type && { type }), // Filtre par type seulement s'il est fourni (ex: 'CLUB')
+      },
+      include, 
     });
   }
 
