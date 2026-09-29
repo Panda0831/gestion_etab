@@ -128,7 +128,7 @@ export default function MesClubs({ user }: { user: User }) {
                   {/* Bouton Espace Bureau si autorisé */}
                   {accesBureau && (
                     <Link
-                      to={`/bureau/club/${club.id}`}
+                      to={`/club/bureau/${club.id}`}
                       className="px-4 py-2 text-xs font-semibold text-white bg-purple-600 rounded-md hover:bg-purple-700 transition shadow-sm"
                     >
                       Espace Bureau

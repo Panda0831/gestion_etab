@@ -14,6 +14,8 @@ import Clubs from "./pages/clubs/Clubs";
 import { User } from "./types/auth";
 import "./App.css";
 import ListeEleves from "./pages/ListEleve";
+import EspaceBureau from "./pages/clubs/EspaceBureau";
+
 
 const API_URL = "http://localhost:3000";
 
@@ -114,6 +116,8 @@ function AnimatedRoutes({
             user ? <Clubs user={user} /> : <Navigate to="/" replace />
           }
         />
+
+        <Route path="/club/bureau/:id" element={<EspaceBureau />} />
       </Routes>
     </AnimatePresence>
   );

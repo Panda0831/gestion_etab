@@ -33,14 +33,8 @@ export class ClubEvenementMembreController {
   }
 
   @Patch(':id')
-  update(
-    @Param('id') id: string,
-    @Body() updateClubEvenementMembreDto: UpdateClubEvenementMembreDto,
-  ) {
-    return this.clubEvenementMembreService.update(
-      id,
-      updateClubEvenementMembreDto,
-    );
+  update(@Param('id') id: string, @Body() updateDto: UpdateClubEvenementMembreDto) {
+    return this.clubEvenementMembreService.update(id, updateDto);
   }
 
   @Delete(':id')
