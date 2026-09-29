@@ -7,9 +7,9 @@ import { UpdateClubEvenementMembreDto } from './dto/update-club-evenement-membre
 export class ClubEvenementMembreService {
   constructor(private readonly prisma: PrismaService) {}
 
-  create(createClubEvenementMembreDto: CreateClubEvenementMembreDto) {
+  create(dto: CreateClubEvenementMembreDto) {
     return this.prisma.clubEvenementMembre.create({
-      data: createClubEvenementMembreDto as any,
+      data: { ...dto },
     });
   }
 
@@ -17,7 +17,7 @@ export class ClubEvenementMembreService {
     return this.prisma.clubEvenementMembre.findMany({
       include: {
         clubEvenement: true,
-        eleve: { include: { utilisateur: true } },
+        utilisateur: true,
       },
     });
   }
@@ -27,7 +27,7 @@ export class ClubEvenementMembreService {
       where: { id },
       include: {
         clubEvenement: true,
-        eleve: { include: { utilisateur: true } },
+        utilisateur: true,
       },
     });
     if (!item) {

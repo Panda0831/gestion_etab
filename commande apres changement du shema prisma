@@ -1,0 +1,5 @@
+Effectuer le db push pour le shema prisma
+    docker compose exec backend npx prisma db push --schema=/app/prisma/schema.prisma
+
+Puis redemarer le backend
+    docker compose restart backend

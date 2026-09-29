@@ -244,6 +244,7 @@ model Utilisateur {
   discussionsRejointes   DiscussionMembre[]
   messagesEnvoyes        Message[]
   clubsResponsables      ClubEvenement[]             @relation("ResponsableClub")
+  clubEvenementMembres    ClubEvenementMembre[]
   organisationsClubs     ClubEvenementOrganisateur[]
   auditLogs              AuditLog[]
 
@@ -281,7 +282,6 @@ model Eleve {
   notes          Note[]
   bulletins      Bulletin[]
   transactions   TransactionFinanciere[]
-  adhesionsClubs ClubEvenementMembre[]
 
   @@index([classeId], map: "idx_eleve_classe")
   @@index([parentId], map: "idx_eleve_parent")
@@ -635,14 +635,14 @@ model Activite {
 model ClubEvenementMembre {
   id              String     @id @default(uuid()) @db.Uuid
   clubEvenementId String     @map("club_evenement_id") @db.Uuid
-  eleveId         String     @map("eleve_id") @db.Uuid
   role            RoleMembre @default(MEMBRE)
   dateAdhesion    DateTime   @default(now()) @map("date_adhesion")
+  utilisateurId   String     @map("utilisateur_id") @db.Uuid
 
   clubEvenement ClubEvenement @relation(fields: [clubEvenementId], references: [id], onDelete: Cascade)
-  eleve         Eleve         @relation(fields: [eleveId], references: [id], onDelete: Cascade)
+  utilisateur      Utilisateur    @relation(fields: [utilisateurId], references: [id], onDelete: Cascade)
 
-  @@unique([clubEvenementId, eleveId])
+  @@unique([clubEvenementId, utilisateurId])
   @@map("club_evenement_membre")
 }
 

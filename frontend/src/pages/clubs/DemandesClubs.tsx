@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { get, patch } from "../../services/api";
+import { get, patch, post } from "../../services/api";
 
 export default function DemandesClubs() {
   const [demandes, setDemandes] = useState<
@@ -16,12 +16,23 @@ export default function DemandesClubs() {
   const traiter = async (id: string, statut: "VALIDE" | "ANNULE") => {
     setError(null);
     try {
-      await patch(`/club-evenement/${id}/statut`, { statut });
-      setDemandes((d) => d.filter((x) => x.id !== id));
+        if (statut === "VALIDE") {
+        const demande = demandes.find((d) => d.id === id);
+
+        await post('/club-evenement-membre', {
+            clubEvenementId: id,
+            utilisateurId: demande?.responsable?.id,
+            role: "BUREAU",
+            dateAdhesion: new Date().toISOString(),
+        });
+        }
+
+        await patch(`/club-evenement/${id}/statut`, { statut });
+        setDemandes((d) => d.filter((x) => x.id !== id));
     } catch {
-      setError("Échec de la mise à jour du statut.");
+        setError("Échec de la mise à jour du statut.");
     }
-  };
+    };
 
   return (
     <div className="p-6 max-w-2xl mx-auto">

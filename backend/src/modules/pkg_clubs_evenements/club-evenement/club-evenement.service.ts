@@ -10,7 +10,7 @@ const include = {
   etablissement: true,
   responsable: userSafe,
   activites: true,
-  membres: { include: { eleve: { include: { utilisateur: userSafe } } } },
+  membres: { include: { utilisateur: userSafe } },
   organisateurs: { include: { utilisateur: userSafe } },
 };
 
