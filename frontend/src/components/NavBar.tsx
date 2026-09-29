@@ -64,6 +64,7 @@ const navLinks: NavLink[] = [
   { to: "/cours", label: "Cours", icon: (a) => <UsersIcon active={a} />, roles: ["ELEVE"] },
   { to: "/coursProf", label: "Cours", icon: (a) => <UsersIcon active={a} />, roles: ["PROFESSEUR"] },
   { to: "/emploi-du-temps", label: "Emploi du temps", icon: (a) => <CalendarNavIcon active={a} /> },
+  { to: "/club", label: "Clubs", icon: (a) => <CalendarNavIcon active={a} /> },
   { to: "/parametres", label: "Paramètres", icon: (a) => <SettingsIcon active={a} /> },
 ];
 

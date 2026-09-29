@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
+import { BrowserRouter, Routes, Route, useLocation, Navigate } from "react-router-dom";
 import { AnimatePresence } from "framer-motion";
 import Navbar from "./components/NavBar";
 import Login from "./components/Login";
@@ -10,6 +10,7 @@ import DirectorDashboard from "./pages/director/DirectorDashboard";
 import CoursEleve from "./pages/cours/CoursEleve";  
 import CoursProfesseur from "./pages/cours/CoursProfesseur";
 import NouveauCours from "./pages/cours/NouveauCours";  
+import Clubs from "./pages/clubs/Clubs";
 import { User } from "./types/auth";
 import "./App.css";
 import ListeEleves from "./pages/ListEleve";
@@ -105,6 +106,12 @@ function AnimatedRoutes({
             ) : (
               <Home user={user} />
             )
+          }
+        />
+        <Route
+          path="/club"
+          element={
+            user ? <Clubs user={user} /> : <Navigate to="/" replace />
           }
         />
       </Routes>
