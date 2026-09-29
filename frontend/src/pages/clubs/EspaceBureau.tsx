@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
-import { get, patch } from "../../services/api";
+import { get, patch, del } from "../../services/api"; // Import de 'del'
 
 interface Membre {
-  id: string; // ID de la relation club_evenement_membre
+  id: string; 
   role: "MEMBRE" | "BUREAU";
   dateAdhesion: string;
   utilisateur: {
@@ -53,10 +53,7 @@ export default function EspaceBureau() {
     const nouveauRole = roleActuel === "MEMBRE" ? "BUREAU" : "MEMBRE";
 
     try {
-      await patch(`/club-evenement-membre/${membreId}`, {
-        role: nouveauRole,
-      });
-
+      await patch(`/club-evenement-membre/${membreId}`, { role: nouveauRole });
       setClub((prev) => {
         if (!prev) return null;
         return {
@@ -66,10 +63,33 @@ export default function EspaceBureau() {
           ),
         };
       });
-    } catch (err) {
+    } catch {
       setErreur("Erreur lors de la modification du rôle.");
     } finally {
       setActionId(null);
+    }
+  };
+
+  // Fonction pour RENVOYER (Exclure) un membre du club
+  const renvoyerMembre = async (membreId: string, nomMembre: string) => {
+    if (window.confirm(`⚠️ Êtes-vous sûr de vouloir exclure définitivement "${nomMembre}" de ce club ?`)) {
+      setActionId(membreId);
+      setErreur(null);
+      try {
+        await del(`/club-evenement-membre/${membreId}`);
+        // Mettre à jour l'interface locale en retirant le membre
+        setClub((prev) => {
+          if (!prev) return null;
+          return {
+            ...prev,
+            membres: prev.membres.filter((m) => m.id !== membreId),
+          };
+        });
+      } catch {
+        setErreur("Impossible d'exclure ce membre.");
+      } finally {
+        setActionId(null);
+      }
     }
   };
 
@@ -78,11 +98,7 @@ export default function EspaceBureau() {
   }
 
   if (!club) {
-    return (
-      <div className="p-6 text-center text-red-600">
-        Club introuvable ou accès refusé.
-      </div>
-    );
+    return <div className="p-6 text-center text-red-600">Club introuvable ou accès refusé.</div>;
   }
 
   return (
@@ -103,11 +119,7 @@ export default function EspaceBureau() {
         </div>
       </div>
 
-      {erreur && (
-        <div className="p-3 text-red-600 bg-red-50 rounded border border-red-200 text-sm">
-          {erreur}
-        </div>
-      )}
+      {erreur && <div className="p-3 text-red-600 bg-red-50 rounded border border-red-200 text-sm">{erreur}</div>}
 
       {/* Tableau des membres */}
       <div className="bg-white border rounded-xl shadow-sm overflow-hidden">
@@ -130,9 +142,8 @@ export default function EspaceBureau() {
               </thead>
               <tbody className="divide-y divide-gray-100 bg-white">
                 {club.membres.map((membre) => {
-                  
-                  // SECURITÉ : Est-ce que ce membre est le responsable légal du club ?
                   const estResponsableLegal = membre.utilisateur.id === club.responsableId;
+                  const nomComplet = `${membre.utilisateur.prenom} ${membre.utilisateur.nom}`;
 
                   return (
                     <tr key={membre.id} className="hover:bg-gray-50 transition">
@@ -140,7 +151,7 @@ export default function EspaceBureau() {
                       {/* Nom & Prénom */}
                       <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
                         <div className="flex flex-col">
-                          <span>{membre.utilisateur.prenom} {membre.utilisateur.nom}</span>
+                          <span>{nomComplet}</span>
                           {estResponsableLegal && (
                             <span className="text-[10px] text-blue-600 font-medium">Fondateur principal</span>
                           )}
@@ -176,22 +187,34 @@ export default function EspaceBureau() {
                             Rôle Verrouillé (Créateur)
                           </span>
                         ) : (
-                          <button
-                            onClick={() => basculerRole(membre.id, membre.role)}
-                            disabled={actionId !== null}
-                            className={`px-3 py-1.5 rounded text-xs font-semibold shadow-sm transition disabled:opacity-50 ${
-                              membre.role === "BUREAU"
-                                ? "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                                : "bg-purple-600 text-white hover:bg-purple-700"
-                            }`}
-                          >
-                            {actionId === membre.id 
-                              ? "Mise à jour..." 
-                              : membre.role === "BUREAU" 
-                                ? "Rétrograder simple Membre" 
-                                : "Nommer au Bureau"
-                            }
-                          </button>
+                          <div className="flex items-center justify-end gap-2">
+                            {/* Nommer/Rétrograder */}
+                            <button
+                              onClick={() => basculerRole(membre.id, membre.role)}
+                              disabled={actionId !== null}
+                              className={`px-3 py-1.5 rounded text-xs font-semibold shadow-sm transition disabled:opacity-50 ${
+                                membre.role === "BUREAU"
+                                  ? "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                                  : "bg-purple-600 text-white hover:bg-purple-700"
+                              }`}
+                            >
+                              {actionId === membre.id 
+                                ? "Mise à jour..." 
+                                : membre.role === "BUREAU" 
+                                  ? "Rétrograder" 
+                                  : "Nommer au Bureau"
+                              }
+                            </button>
+
+                            {/* EXCLURE (Renvoyer) */}
+                            <button
+                              onClick={() => renvoyerMembre(membre.id, nomComplet)}
+                              disabled={actionId !== null}
+                              className="px-3 py-1.5 rounded text-xs font-semibold text-red-600 bg-red-50 hover:bg-red-100 transition disabled:opacity-50"
+                            >
+                              Renvoyer
+                            </button>
+                          </div>
                         )}
                       </td>
 

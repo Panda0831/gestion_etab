@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom"; // Pour la navigation vers l'espace bureau
+import { Link } from "react-router-dom"; 
 import { getClubsEvenementByUtilisateur } from "../../services/ClubEvenementService"; 
-import { get, post } from "../../services/api"; 
+import { get, post, del } from "../../services/api"; // Import de 'del' pour supprimer l'adhésion
 import { User } from "../../types/auth";
 
 interface Club {
@@ -10,7 +10,7 @@ interface Club {
   description?: string;
   responsableId: string;
   statut: string;
-  membres: { role: string; utilisateurId: string }[];
+  membres: { id: string; role: string; utilisateurId: string }[]; // Ajout de l'ID d'adhésion
 }
 
 export default function MesClubs({ user }: { user: User }) {
@@ -25,14 +25,11 @@ export default function MesClubs({ user }: { user: User }) {
     setChargement(true);
     setErreur(null);
     try {
-      // 1. Charger mes affiliations (Responsable, Bureau, Membre)
       const mesClubsDonnees: Club[] = await getClubsEvenementByUtilisateur(user.id, "CLUB");
       setMyClubs(mesClubsDonnees);
 
-      // 2. Charger tous les clubs validés du système
       const tousLesClubs: Club[] = await get("/club-evenement?type=CLUB");
 
-      // 3. Filtrer pour les clubs disponibles (uniquement VALIDE, et où je n'ai aucun rôle)
       const mesClubsIds = new Set(mesClubsDonnees.map((c) => c.id));
       const dispo = tousLesClubs.filter(
         (club) => 
@@ -72,10 +69,38 @@ export default function MesClubs({ user }: { user: User }) {
     }
   };
 
+  // Fonction pour QUITTER le club
+  const quitterClub = async (club: Club) => {
+    setErreur(null);
+    setSucces(null);
+
+    // SECURITÉ : Si l'utilisateur est le responsable principal
+    if (club.responsableId === user.id) {
+      alert("❌ Action impossible : Vous êtes le responsable de ce club. Vous devez nommer un nouveau responsable (depuis l'Espace Bureau) avant de pouvoir quitter le club.");
+      return;
+    }
+
+    const membreId = club.membres[0]?.id; // Récupère l'ID d'adhésion
+    if (!membreId) return;
+
+    if (window.confirm(`Êtes-vous sûr de vouloir quitter le club "${club.nom}" ?`)) {
+      setActionEnCours(club.id);
+      try {
+        await del(`/club-evenement-membre/${membreId}`);
+        setSucces(`Vous avez quitté le club "${club.nom}".`);
+        await chargerDonnees();
+      } catch {
+        setErreur("Impossible de quitter le club.");
+      } finally {
+        setActionEnCours(null);
+      }
+    }
+  };
+
   return (
     <div className="p-6 max-w-3xl mx-auto space-y-8">
       
-      {/* Messages */}
+      {/* Messages d'alerte */}
       {erreur && <div className="p-3 text-red-600 bg-red-50 rounded border border-red-200 text-sm">{erreur}</div>}
       {succes && <div className="p-3 text-green-600 bg-green-50 rounded border border-green-200 text-sm">{succes}</div>}
 
@@ -93,9 +118,6 @@ export default function MesClubs({ user }: { user: User }) {
             {myClubs.map((club) => {
               const estResponsable = club.responsableId === user.id;
               const roleMembre = club.membres[0]?.role || "MEMBRE";
-              
-              // Est-ce que l'utilisateur a le droit d'accéder à l'Espace Bureau ?
-              // (S'il est créateur/responsable OU membre désigné "BUREAU")
               const accesBureau = estResponsable || roleMembre === "BUREAU";
 
               return (
@@ -107,7 +129,6 @@ export default function MesClubs({ user }: { user: User }) {
                     <div className="flex items-center gap-2">
                       <h2 className="font-semibold text-gray-800 text-lg">{club.nom}</h2>
                       
-                      {/* Badge de statut */}
                       {estResponsable ? (
                         <span className="px-2 py-0.5 text-[10px] font-bold rounded-full bg-blue-100 text-blue-800 uppercase">
                           Responsable
@@ -125,15 +146,25 @@ export default function MesClubs({ user }: { user: User }) {
                     )}
                   </div>
 
-                  {/* Bouton Espace Bureau si autorisé */}
-                  {accesBureau && (
-                    <Link
-                      to={`/club/bureau/${club.id}`}
-                      className="px-4 py-2 text-xs font-semibold text-white bg-purple-600 rounded-md hover:bg-purple-700 transition shadow-sm"
+                  {/* Actions */}
+                  <div className="flex items-center gap-2">
+                    {accesBureau && (
+                      <Link
+                        to={`/club/bureau/${club.id}`}
+                        className="px-3 py-2 text-xs font-semibold text-white bg-purple-600 rounded-md hover:bg-purple-700 transition"
+                      >
+                        Espace Bureau
+                      </Link>
+                    )}
+                    
+                    <button
+                      onClick={() => quitterClub(club)}
+                      disabled={actionEnCours !== null}
+                      className="px-3 py-2 text-xs font-semibold text-red-600 bg-red-50 rounded-md hover:bg-red-100 transition disabled:opacity-50"
                     >
-                      Espace Bureau
-                    </Link>
-                  )}
+                      Quitter
+                    </button>
+                  </div>
                 </div>
               );
             })}
@@ -168,7 +199,7 @@ export default function MesClubs({ user }: { user: User }) {
                 <button
                   onClick={() => rejoindre(club.id)}
                   disabled={actionEnCours !== null}
-                  className="px-4 py-1.5 text-xs font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 transition disabled:opacity-50"
+                  className="px-4 py-1.5 text-xs font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 transition"
                 >
                   {actionEnCours === club.id ? "Adhésion..." : "Rejoindre"}
                 </button>
