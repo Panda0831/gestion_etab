@@ -1,5 +1,5 @@
 import {
-  Body, Controller, Delete, ForbiddenException, Get, Param, Patch, Post, Req, UseGuards,
+  Body, Controller, Delete, ForbiddenException, Get, Param, Patch, Post, Req, UseGuards, Query,
 } from '@nestjs/common';
 import { ClubEvenementService } from './club-evenement.service';
 import { CreateClubEvenementDto } from './dto/create-club-evenement.dto';
@@ -52,5 +52,13 @@ export class ClubEvenementController {
   @Delete(':id')
   remove(@Param('id') id: string, @Req() req) {
     return this.clubEvenementService.remove(id, req.user.etablissementId);
+  }
+
+  @Get('utilisateur/:utilisateurId')
+  findByUtilisateur(
+    @Param('utilisateurId') utilisateurId: string,
+    @Query('type') type: 'CLUB' | 'EVENEMENT',
+  ) {
+    return this.clubEvenementService.findByUtilisateur(utilisateurId, type);
   }
 }

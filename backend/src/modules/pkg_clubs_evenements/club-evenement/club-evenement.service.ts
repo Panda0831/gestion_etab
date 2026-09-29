@@ -69,4 +69,35 @@ export class ClubEvenementService {
     await this.findOne(id, etablissementId);
     return this.prisma.clubEvenement.update({ where: { id }, data: { statut } });
   }
+
+  async findByUtilisateur(utilisateurId: string, type: 'CLUB' | 'EVENEMENT') {
+    return this.prisma.clubEvenement.findMany({
+      where: {
+        type: type, // Filtre par type : 'CLUB' ou 'EVENEMENT'
+        OR: [
+          // Condition 1 : L'utilisateur est le responsable (créateur)
+          { responsableId: utilisateurId },
+          
+          // Condition 2 : L'utilisateur fait partie des membres
+          {
+            membres: {
+              some: {
+                utilisateurId: utilisateurId,
+              },
+            },
+          },
+        ],
+      },
+      include: {
+        responsable: {
+          select: { id: true, nom: true, prenom: true },
+        },
+        membres: {
+          where: {
+            utilisateurId: utilisateurId, // Permet de récupérer son rôle spécifique dans le club
+          },
+        },
+      },
+    });
+  } 
 }

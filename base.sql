@@ -308,10 +308,10 @@ CREATE TABLE activite (
 CREATE TABLE club_evenement_membre (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     club_evenement_id UUID NOT NULL REFERENCES club_evenement(id) ON DELETE CASCADE,
-    eleve_id UUID NOT NULL REFERENCES eleve(id) ON DELETE CASCADE,
+    utilisateur_id UUID NOT NULL REFERENCES utilisateur(id) ON DELETE CASCADE,
     role role_membre DEFAULT 'MEMBRE',
     date_adhesion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    UNIQUE(club_evenement_id, eleve_id)
+    UNIQUE(club_evenement_id, utilisateur_id)
 );
 
 CREATE TABLE club_evenement_organisateur (
