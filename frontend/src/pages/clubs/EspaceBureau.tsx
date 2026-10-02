@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
-import { get, patch, del } from "../../services/api"; // Import de 'del'
-
+import { get, patch, del } from "../../services/api";
+import "./EspaceBureau.css";
 
 interface Membre {
-  id: string; 
+  id: string;
   role: "MEMBRE" | "BUREAU";
   dateAdhesion: string;
   utilisateur: {
@@ -27,11 +27,18 @@ interface ClubDetails {
   membres: Membre[];
 }
 
+/** Initiales à partir d'un prénom + nom (max 2 lettres). */
+function getInitiales(prenom: string, nom: string): string {
+  const p = prenom?.trim()?.[0] ?? "";
+  const n = nom?.trim()?.[0] ?? "";
+  return (p + n).toUpperCase() || "?";
+}
+
 export default function EspaceBureau() {
-  const { id } = useParams<{ id: string }>(); 
+  const { id } = useParams<{ id: string }>();
   const [club, setClub] = useState<ClubDetails | null>(null);
   const [chargement, setChargement] = useState(true);
-  const [actionId, setActionId] = useState<string | null>(null); 
+  const [actionId, setActionId] = useState<string | null>(null);
   const [erreur, setErreur] = useState<string | null>(null);
 
   useEffect(() => {
@@ -39,7 +46,7 @@ export default function EspaceBureau() {
       try {
         const donnees = await get(`/club-evenement/${id}`);
         setClub(donnees);
-      } catch (err) {
+      } catch {
         setErreur("Impossible de charger les informations du club.");
       } finally {
         setChargement(false);
@@ -48,7 +55,10 @@ export default function EspaceBureau() {
     chargerClub();
   }, [id]);
 
-  const basculerRole = async (membreId: string, roleActuel: "MEMBRE" | "BUREAU") => {
+  const basculerRole = async (
+    membreId: string,
+    roleActuel: "MEMBRE" | "BUREAU"
+  ) => {
     setActionId(membreId);
     setErreur(null);
     const nouveauRole = roleActuel === "MEMBRE" ? "BUREAU" : "MEMBRE";
@@ -71,14 +81,16 @@ export default function EspaceBureau() {
     }
   };
 
-  // Fonction pour RENVOYER (Exclure) un membre du club
   const renvoyerMembre = async (membreId: string, nomMembre: string) => {
-    if (window.confirm(`⚠️ Êtes-vous sûr de vouloir exclure définitivement "${nomMembre}" de ce club ?`)) {
+    if (
+      window.confirm(
+        `⚠️ Êtes-vous sûr de vouloir exclure définitivement "${nomMembre}" de ce club ?`
+      )
+    ) {
       setActionId(membreId);
       setErreur(null);
       try {
         await del(`/club-evenement-membre/${membreId}`);
-        // Mettre à jour l'interface locale en retirant le membre
         setClub((prev) => {
           if (!prev) return null;
           return {
@@ -94,154 +106,188 @@ export default function EspaceBureau() {
     }
   };
 
+  /* ---------- Chargement ---------- */
   if (chargement) {
-    return <p className="text-center py-10 text-gray-500">Chargement de l'Espace Bureau...</p>;
+    return (
+      <div className="eb-page">
+        <div className="eb-loading">
+          <span className="eb-spinner" aria-hidden="true" />
+          Chargement de l'Espace Bureau…
+        </div>
+      </div>
+    );
   }
 
+  /* ---------- Erreur / club introuvable ---------- */
   if (!club) {
-    return <div className="p-6 text-center text-red-600">Club introuvable ou accès refusé.</div>;
+    return (
+      <div className="eb-page">
+        <div className="eb-alert eb-alert--error" role="alert">
+          Club introuvable ou accès refusé.
+        </div>
+        <Link to="/club" className="eb-back">
+          ← Retour à mes clubs
+        </Link>
+      </div>
+    );
   }
 
+  /* ---------- Rendu principal ---------- */
   return (
-    <div className="p-6 max-w-4xl mx-auto space-y-6">
-      
-      {/* En-tête */}
-        <div className="flex justify-between items-center border-b pb-4">
-        <div>
-            <Link to="/club" className="text-sm text-blue-600 hover:underline">
-            &larr; Retour à mes clubs
-            </Link>
-            <h1 className="text-3xl font-extrabold text-gray-900 mt-2">
-            Espace Bureau - {club.nom}
-            </h1>
-            <p className="text-gray-500 text-sm mt-1">
-            Créateur & Responsable :{" "}
-            <span className="font-semibold text-blue-600">
-                {club.responsable.prenom} {club.responsable.nom}
-            </span>
-            </p>
+    <div className="eb-page">
+      {/* ---------- En-tête (unique, plus de doublon) ---------- */}
+      <header className="eb-header">
+        <div className="eb-header-left">
+          <Link to="/club" className="eb-back">
+            ← Retour à mes clubs
+          </Link>
+          <h1 className="eb-title">
+            Espace Bureau · <span className="eb-title-club">{club.nom}</span>
+          </h1>
+          <p className="eb-subtitle">
+            Créateur &amp; Responsable :{" "}
+            <strong>
+              {club.responsable.prenom} {club.responsable.nom}
+            </strong>
+          </p>
         </div>
 
         <Link
-            to={`/club/${club.id}/activites`}
-            className="px-4 py-2 rounded-lg bg-blue-600 text-white text-sm font-semibold shadow-sm hover:bg-blue-700 transition"
+          to={`/club/${club.id}/activites`}
+          className="eb-btn eb-btn--primary"
         >
-            Gérer les activités
+          Gérer les activités
         </Link>
-        </div>
-      <div className="flex justify-between items-center border-b pb-4">
-        <div>
-          <Link to="/club" className="text-sm text-blue-600 hover:underline">
-            &larr; Retour à mes clubs
-          </Link>
-          <h1 className="text-3xl font-extrabold text-gray-900 mt-2">
-            Espace Bureau - {club.nom}
-          </h1>
-          <p className="text-gray-500 text-sm mt-1">
-            Créateur & Responsable : <span className="font-semibold text-blue-600">{club.responsable.prenom} {club.responsable.nom}</span>
-          </p>
-        </div>
-      </div>
+      </header>
 
-      {erreur && <div className="p-3 text-red-600 bg-red-50 rounded border border-red-200 text-sm">{erreur}</div>}
+      {/* ---------- Alerte erreur ---------- */}
+      {erreur && (
+        <div className="eb-alert eb-alert--error" role="alert">
+          {erreur}
+        </div>
+      )}
 
-      {/* Tableau des membres */}
-      <div className="bg-white border rounded-xl shadow-sm overflow-hidden">
-        <div className="p-4 border-b bg-gray-50">
-          <h2 className="text-lg font-bold text-gray-800">Membres du club</h2>
+      {/* ---------- Tableau des membres ---------- */}
+      <section className="eb-card">
+        <div className="eb-card-header">
+          <h2 className="eb-card-title">
+            Membres du club
+            <span className="eb-card-count">{club.membres.length}</span>
+          </h2>
         </div>
 
         {club.membres.length === 0 ? (
-          <p className="p-8 text-center text-gray-500">Aucun membre n'a encore rejoint ce club.</p>
+          <p className="eb-empty">
+            Aucun membre n'a encore rejoint ce club.
+          </p>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200 text-sm">
-              <thead className="bg-gray-50 text-gray-500 text-xs uppercase font-semibold">
+          <div className="eb-table-wrapper">
+            <table className="eb-table">
+              <thead>
                 <tr>
-                  <th className="px-6 py-3 text-left">Nom & Prénom</th>
-                  <th className="px-6 py-3 text-left">Date d'adhésion</th>
-                  <th className="px-6 py-3 text-center">Rôle Actuel</th>
-                  <th className="px-6 py-3 text-right">Actions</th>
+                  <th>Membre</th>
+                  <th>Date d'adhésion</th>
+                  <th className="eb-th-center">Rôle actuel</th>
+                  <th className="eb-th-right">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-100 bg-white">
+              <tbody>
                 {club.membres.map((membre) => {
-                  const estResponsableLegal = membre.utilisateur.id === club.responsableId;
+                  const estResponsableLegal =
+                    membre.utilisateur.id === club.responsableId;
                   const nomComplet = `${membre.utilisateur.prenom} ${membre.utilisateur.nom}`;
+                  const initiales = getInitiales(
+                    membre.utilisateur.prenom,
+                    membre.utilisateur.nom
+                  );
 
                   return (
-                    <tr key={membre.id} className="hover:bg-gray-50 transition">
-                      
-                      {/* Nom & Prénom */}
-                      <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
-                        <div className="flex flex-col">
-                          <span>{nomComplet}</span>
-                          {estResponsableLegal && (
-                            <span className="text-[10px] text-blue-600 font-medium">Fondateur principal</span>
-                          )}
+                    <tr key={membre.id}>
+                      {/* Membre */}
+                      <td>
+                        <div className="eb-membre-cell">
+                          <div className="eb-avatar" aria-hidden="true">
+                            {initiales}
+                          </div>
+                          <div className="eb-membre-info">
+                            <span className="eb-membre-nom">{nomComplet}</span>
+                            {estResponsableLegal && (
+                              <span className="eb-membre-tag">
+                                Fondateur principal
+                              </span>
+                            )}
+                          </div>
                         </div>
                       </td>
 
                       {/* Date d'adhésion */}
-                      <td className="px-6 py-4 text-gray-500">
-                        {new Date(membre.dateAdhesion).toLocaleDateString("fr-FR")}
+                      <td>
+                        <span className="eb-date">
+                          {new Date(membre.dateAdhesion).toLocaleDateString(
+                            "fr-FR"
+                          )}
+                        </span>
                       </td>
 
-                      {/* Badge Rôle */}
-                      <td className="px-6 py-4 text-center whitespace-nowrap">
+                      {/* Badge rôle */}
+                      <td style={{ textAlign: "center" }}>
                         {estResponsableLegal ? (
-                          <span className="px-2.5 py-1 text-xs font-bold rounded-full uppercase bg-blue-100 text-blue-800 border border-blue-200">
-                            Créateur (Bureau)
+                          <span className="eb-badge eb-badge--createur">
+                            Créateur
+                          </span>
+                        ) : membre.role === "BUREAU" ? (
+                          <span className="eb-badge eb-badge--bureau">
+                            Bureau
                           </span>
                         ) : (
-                          <span className={`px-2.5 py-1 text-xs font-bold rounded-full uppercase ${
-                            membre.role === "BUREAU" 
-                              ? "bg-purple-100 text-purple-800 border border-purple-200" 
-                              : "bg-green-100 text-green-800 border border-green-200"
-                          }`}>
-                            {membre.role === "BUREAU" ? "Bureau" : "Membre"}
+                          <span className="eb-badge eb-badge--membre">
+                            Membre
                           </span>
                         )}
                       </td>
 
                       {/* Actions */}
-                      <td className="px-6 py-4 text-right whitespace-nowrap">
+                      <td>
                         {estResponsableLegal ? (
-                          <span className="text-xs text-gray-400 italic font-medium mr-2">
-                            Rôle Verrouillé (Créateur)
-                          </span>
+                          <div className="eb-actions">
+                            <span className="eb-locked">
+                              Rôle verrouillé (créateur)
+                            </span>
+                          </div>
                         ) : (
-                          <div className="flex items-center justify-end gap-2">
-                            {/* Nommer/Rétrograder */}
+                          <div className="eb-actions">
                             <button
-                              onClick={() => basculerRole(membre.id, membre.role)}
+                              type="button"
+                              onClick={() =>
+                                basculerRole(membre.id, membre.role)
+                              }
                               disabled={actionId !== null}
-                              className={`px-3 py-1.5 rounded text-xs font-semibold shadow-sm transition disabled:opacity-50 ${
+                              className={`eb-btn ${
                                 membre.role === "BUREAU"
-                                  ? "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                                  : "bg-purple-600 text-white hover:bg-purple-700"
+                                  ? "eb-btn--ghost"
+                                  : "eb-btn--bureau"
                               }`}
                             >
-                              {actionId === membre.id 
-                                ? "Mise à jour..." 
-                                : membre.role === "BUREAU" 
-                                  ? "Rétrograder" 
-                                  : "Nommer au Bureau"
-                              }
+                              {actionId === membre.id
+                                ? "Mise à jour…"
+                                : membre.role === "BUREAU"
+                                ? "Rétrograder"
+                                : "Nommer au Bureau"}
                             </button>
 
-                            {/* EXCLURE (Renvoyer) */}
                             <button
-                              onClick={() => renvoyerMembre(membre.id, nomComplet)}
+                              type="button"
+                              onClick={() =>
+                                renvoyerMembre(membre.id, nomComplet)
+                              }
                               disabled={actionId !== null}
-                              className="px-3 py-1.5 rounded text-xs font-semibold text-red-600 bg-red-50 hover:bg-red-100 transition disabled:opacity-50"
+                              className="eb-btn eb-btn--danger"
                             >
                               Renvoyer
                             </button>
                           </div>
                         )}
                       </td>
-
                     </tr>
                   );
                 })}
@@ -249,8 +295,7 @@ export default function EspaceBureau() {
             </table>
           </div>
         )}
-      </div>
-
+      </section>
     </div>
   );
 }

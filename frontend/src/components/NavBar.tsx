@@ -19,17 +19,6 @@ function HomeIcon({ active }: { active: boolean }) {
   );
 }
 
-function UsersIcon({ active }: { active: boolean }) {
-  return (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={active ? "var(--primary)" : "currentColor"} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
-      <circle cx="9" cy="7" r="4" />
-      <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
-      <path d="M16 3.13a4 4 0 0 1 0 7.75" />
-    </svg>
-  );
-}
-
 function CalendarNavIcon({ active }: { active: boolean }) {
   return (
     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={active ? "var(--primary)" : "currentColor"} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -50,6 +39,35 @@ function SettingsIcon({ active }: { active: boolean }) {
   );
 }
 
+function CoursIcon({ active }: { active: boolean }) {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={active ? "var(--primary)" : "currentColor"} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M2 4h6a4 4 0 0 1 4 4v13a3 3 0 0 0-3-3H2z" />
+      <path d="M22 4h-6a4 4 0 0 0-4 4v13a3 3 0 0 1 3-3h7z" />
+    </svg>
+  );
+}
+
+function ClubIcon({ active }: { active: boolean }) {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={active ? "var(--primary)" : "currentColor"} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="9" cy="7" r="3.5" />
+      <path d="M2 21v-1a6 6 0 0 1 6-6h2a6 6 0 0 1 6 6v1" />
+      <path d="M16 3.5a3.5 3.5 0 0 1 0 7" />
+      <path d="M22 21v-1a6 6 0 0 0-4-5.65" />
+    </svg>
+  );
+}
+
+function ElevesIcon({ active }: { active: boolean }) {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={active ? "var(--primary)" : "currentColor"} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M22 9 12 4 2 9l10 5 10-5z" />
+      <path d="M6 11.5V16c0 1.5 2.7 3 6 3s6-1.5 6-3v-4.5" />
+      <path d="M22 9v6" />
+    </svg>
+  );
+}
 
 interface NavLink {
   to: string;
@@ -60,11 +78,11 @@ interface NavLink {
 
 const navLinks: NavLink[] = [
   { to: "/", label: "Accueil", icon: (a) => <HomeIcon active={a} /> },
-  { to: "/eleves", label: "Élèves", icon: (a) => <UsersIcon active={a} />, roles: ["ELEVE", "PROFESSEUR"] },
-  { to: "/cours", label: "Cours", icon: (a) => <UsersIcon active={a} />, roles: ["ELEVE"] },
-  { to: "/coursProf", label: "Cours", icon: (a) => <UsersIcon active={a} />, roles: ["PROFESSEUR"] },
+  { to: "/eleves", label: "Élèves", icon: (a) => <ElevesIcon active={a} />, roles: ["ELEVE", "PROFESSEUR"] },
+  { to: "/cours", label: "Cours", icon: (a) => <CoursIcon active={a} />, roles: ["ELEVE"] },
+  { to: "/coursProf", label: "Cours", icon: (a) => <CoursIcon active={a} />, roles: ["PROFESSEUR"] },
   { to: "/emploi-du-temps", label: "Emploi du temps", icon: (a) => <CalendarNavIcon active={a} /> },
-  { to: "/club", label: "Clubs", icon: (a) => <CalendarNavIcon active={a} /> },
+  { to: "/club", label: "Clubs", icon: (a) => <ClubIcon active={a} /> },
   { to: "/parametres", label: "Paramètres", icon: (a) => <SettingsIcon active={a} /> },
 ];
 

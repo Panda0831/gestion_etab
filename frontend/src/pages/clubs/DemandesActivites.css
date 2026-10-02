@@ -1,0 +1,307 @@
+/* =========================================================
+   DemandesActivites — aligné sur le vibe global
+   Palette : slate + blue-600 · Arrondis 8/12/999 · Ombres quasi nulles
+   Contient son propre correctif navbar (aucune modif index.css requise)
+   ========================================================= */
+
+/* ---------- Wrapper racine ---------- */
+.da-page {
+  width: 100%;
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 32px 24px 48px;
+
+  /* Correctif : compense une navbar fixed (ajuste si besoin) */
+  padding-top: 96px;
+
+  overflow: visible;
+  box-sizing: border-box;
+  color: #1e293b;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+/* ---------- Lien retour ---------- */
+.da-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: #64748b;
+  text-decoration: none;
+  transition: color 0.15s ease;
+  margin-bottom: 12px;
+}
+
+.da-back:hover {
+  color: #2563eb;
+}
+
+/* ---------- En-tête ---------- */
+.da-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #e2e8f0;
+  margin-bottom: 24px;
+}
+
+.da-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: #1e293b;
+  margin: 0;
+  line-height: 1.25;
+}
+
+.da-subtitle {
+  font-size: 0.85rem;
+  color: #64748b;
+  margin: 4px 0 0;
+}
+
+/* ---------- Alertes ---------- */
+.da-alert {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  margin-bottom: 20px;
+  border: 1px solid transparent;
+  animation: da-fade-slide 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.da-alert--error {
+  background: #fef2f2;
+  color: #b91c1c;
+  border-color: #fecaca;
+}
+
+/* ---------- Boutons ---------- */
+.da-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border-radius: 8px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+  font-family: inherit;
+  white-space: nowrap;
+  text-decoration: none;
+}
+
+.da-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.da-btn--primary {
+  background: #2563eb;
+  color: #ffffff;
+}
+.da-btn--primary:hover:not(:disabled) {
+  background: #1d4ed8;
+}
+
+.da-btn--success {
+  background: #10b981;
+  color: #ffffff;
+}
+.da-btn--success:hover:not(:disabled) {
+  background: #059669;
+}
+
+/* ---------- Formulaire ---------- */
+.da-form {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  animation: da-fade-slide 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.da-form-title {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #64748b;
+  margin: 0 0 4px;
+}
+
+.da-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.da-label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #64748b;
+}
+
+.da-input,
+.da-textarea {
+  width: 100%;
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+  background: #ffffff;
+  font-size: 0.875rem;
+  font-family: inherit;
+  color: #1e293b;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  box-sizing: border-box;
+}
+
+.da-input::placeholder,
+.da-textarea::placeholder {
+  color: #94a3b8;
+}
+
+.da-input:focus,
+.da-textarea:focus {
+  outline: none;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+}
+
+.da-textarea {
+  resize: vertical;
+  min-height: 76px;
+  line-height: 1.5;
+}
+
+.da-form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  padding-top: 4px;
+}
+
+/* ---------- Liste d'activités ---------- */
+.da-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.da-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 16px;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  animation: da-fade-slide 0.3s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.da-card:hover {
+  border-color: #cbd5e1;
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.04);
+}
+
+.da-card-title {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #1e293b;
+  margin: 0 0 4px;
+  line-height: 1.35;
+}
+
+.da-card-desc {
+  font-size: 0.85rem;
+  color: #64748b;
+  margin: 4px 0 10px;
+  line-height: 1.5;
+}
+
+.da-card-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  font-size: 0.78rem;
+  color: #64748b;
+  padding-top: 10px;
+  border-top: 1px solid #f1f5f9;
+}
+
+.da-meta-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  background: #f8fafc;
+  color: #475569;
+  border: 1px solid #e2e8f0;
+  white-space: nowrap;
+}
+
+.da-meta-pill--date {
+  background: #eff6ff;
+  color: #2563eb;
+  border-color: #dbeafe;
+}
+
+/* ---------- État vide ---------- */
+.da-empty {
+  padding: 40px 24px;
+  text-align: center;
+  color: #94a3b8;
+  font-size: 0.85rem;
+  background: #f8fafc;
+  border: 1px dashed #e2e8f0;
+  border-radius: 12px;
+}
+
+/* ---------- Animations ---------- */
+@keyframes da-fade-slide {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 640px) {
+  .da-page {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+
+  .da-header {
+    align-items: stretch;
+  }
+
+  .da-header .da-btn {
+    align-self: flex-start;
+  }
+}

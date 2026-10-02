@@ -10,7 +10,7 @@ import "./CoursEleve.css";
 
 interface CoursEleveProps {
   user: User;
-  onLogout?: () => void;
+  onLogout?: () => voaid;
 }
 
 export default function CoursEleve({ user }: CoursEleveProps) {

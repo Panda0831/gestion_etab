@@ -1,27 +1,238 @@
-.cours-page { padding: 6rem 1.5rem 2rem; max-width: 1100px; margin: 0 auto; }
-.cours-header p, .cours-meta { color: #64748b; font-size: 0.875rem; margin: 0.25rem 0; }
+/* =========================================================
+   Page Cours Élève — même vibe que ListeEleves
+   Palette : slate (neutral) + blue-600 (accent)
+   ========================================================= */
 
-.cours-matieres { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 1.5rem 0; }
-.cours-chip { padding: 0.4rem 0.9rem; border-radius: 999px; border: 1px solid #e2e8f0; background: #fff; cursor: pointer; }
-.cours-chip.active { background: var(--primary); color: #fff; border-color: var(--primary); }
+/* ---------- Conteneur principal ---------- */
+.cours-page {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 24px;
+}
 
-.cours-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 1rem; }
-.cours-card { text-align: left; padding: 1rem; border: 1px solid #e2e8f0; border-radius: 12px; background: #fff; cursor: pointer; }
-.cours-card h3 { margin: 0.5rem 0 0.25rem; }
+/* ---------- En-tête ---------- */
+.cours-header {
+  margin-bottom: 24px;
+}
 
-.cours-badge { font-size: 0.7rem; font-weight: 600; padding: 0.15rem 0.5rem; border-radius: 6px; background: #eef2ff; color: #4338ca; }
-.cours-badge.td { background: #ecfdf5; color: #047857; }
-.cours-badge.tp { background: #fff7ed; color: #c2410c; }
+.cours-header h1 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0 0 4px 0;
+  letter-spacing: -0.01em;
+}
 
-.cours-overlay { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.5); display: flex; align-items: center; justify-content: center; padding: 1rem; z-index: 100; }
-.cours-modal { position: relative; background: #fff; border-radius: 16px; padding: 1.5rem; width: 100%; max-width: 720px; max-height: 85vh; overflow-y: auto; }
-.cours-close { position: absolute; top: 1rem; right: 1rem; border: none; background: none; cursor: pointer; font-size: 1.1rem; }
-.cours-contenu { white-space: pre-wrap; margin: 1rem 0; line-height: 1.6; }
-.cours-medias { display: flex; flex-direction: column; gap: 0.75rem; }
-.cours-media-player, .cours-media-image { max-width: 100%; border-radius: 8px; }
-.cours-media-link { color: var(--primary); }
-.cours-modal-top { display: flex; align-items: center; gap: 0.75rem; }
-.cours-prof { color: #475569; font-size: 0.875rem; font-weight: 500; float: right; padding-right: 50px;}
-.cours-media-pdf { width: 100%; height: 400px; border: 1px solid #e2e8f0; border-radius: 8px; }
-.cours-modal-actions { display: flex; gap: 0.5rem; margin-bottom: 1rem; }
-.cours-chip.danger { color: #ef4444; border-color: #fecaca; }
+.cours-header p {
+  color: #64748b;
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+/* ---------- Filtres matières (chips) ---------- */
+.cours-matieres {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.cours-chip {
+  padding: 6px 14px;
+  border-radius: 999px;
+  border: 1px solid #e2e8f0;
+  background: #ffffff;
+  color: #475569;
+  font-size: 0.8rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.cours-chip:hover {
+  background: #f8fafc;
+  border-color: #cbd5e1;
+}
+
+.cours-chip.active {
+  background: #2563eb;
+  border-color: #2563eb;
+  color: #ffffff;
+  font-weight: 600;
+}
+
+/* ---------- Liste des cours (grille) ---------- */
+.cours-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 16px;
+}
+
+/* ---------- Carte cours ---------- */
+.cours-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
+  gap: 6px;
+  padding: 16px;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  background: #ffffff;
+  cursor: pointer;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  font-family: inherit;
+}
+
+.cours-card:hover {
+  border-color: #cbd5e1;
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.04);
+}
+
+.cours-card h3 {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #1e293b;
+  margin: 4px 0 0 0;
+  line-height: 1.35;
+}
+
+.cours-meta {
+  font-size: 0.78rem;
+  color: #94a3b8;
+  margin: 0;
+}
+
+.cours-prof {
+  font-size: 0.78rem;
+  color: #64748b;
+  font-weight: 500;
+  margin-top: 2px;
+}
+
+/* ---------- Badge type de cours ---------- */
+.cours-badge {
+  display: inline-block;
+  padding: 3px 9px;
+  border-radius: 999px;
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  background: #eff6ff;
+  color: #2563eb;
+}
+
+/* Variantes selon le type (adapte les classes à tes valeurs backend) */
+.cours-badge.cours {
+  background: #eff6ff;
+  color: #2563eb;
+}
+
+.cours-badge.devoir {
+  background: #fffbeb;
+  color: #f59e0b;
+}
+
+.cours-badge.exercice {
+  background: #ecfdf5;
+  color: #10b981;
+}
+
+.cours-badge.evaluation {
+  background: #fef2f2;
+  color: #ef4444;
+}
+
+/* ---------- Overlay + modale ---------- */
+.cours-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  z-index: 1000;
+  backdrop-filter: blur(2px);
+}
+
+.cours-modal {
+  position: relative;
+  width: 100%;
+  max-width: 640px;
+  max-height: 85vh;
+  overflow-y: auto;
+  background: #ffffff;
+  border-radius: 14px;
+  padding: 24px;
+  box-shadow: 0 20px 50px rgba(15, 23, 42, 0.18);
+}
+
+.cours-modal h2 {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 8px 0 6px 0;
+  letter-spacing: -0.01em;
+}
+
+/* Bouton fermer */
+.cours-close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  border: none;
+  background: #f1f5f9;
+  color: #64748b;
+  font-size: 0.85rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.cours-close:hover {
+  background: #e2e8f0;
+  color: #1e293b;
+}
+
+/* Contenu texte du cours */
+.cours-contenu {
+  margin-top: 16px;
+  padding: 14px 16px;
+  background: #f8fafc;
+  border-radius: 10px;
+  border: 1px solid #f1f5f9;
+  color: #334155;
+  font-size: 0.88rem;
+  line-height: 1.6;
+  white-space: pre-wrap;
+}
+
+/* Section médias */
+.cours-medias {
+  margin-top: 20px;
+}
+
+.cours-medias h4 {
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #64748b;
+  margin: 0 0 10px 0;
+}
+
+/* États simples (chargement / erreur / vide) */
+.cours-page > p {
+  color: #64748b;
+  font-size: 0.9rem;
+}
+

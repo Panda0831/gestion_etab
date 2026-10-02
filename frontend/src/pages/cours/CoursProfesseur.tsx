@@ -100,7 +100,7 @@ export default function CoursProfesseur({ user }: CoursProfesseurProps) {
           {coursAnnee.length} cours
           {anneeActive !== ALL && ` · ${anneeActive}`}
         </p>
-        <button className="cours-chip active" onClick={() => navigate("/cours/nouveau")}>
+        <button className="cours-chip active" onClick={() => navigate("/coursProf/nouveau")}>
           + Nouveau cours
         </button>
       </header>

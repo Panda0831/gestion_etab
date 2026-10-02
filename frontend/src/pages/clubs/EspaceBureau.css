@@ -1,0 +1,418 @@
+/* =========================================================
+   EspaceBureau — aligné sur le vibe global
+   Palette : slate + blue-600 · Arrondis 8/12/999 · Ombres quasi nulles
+   Contient ses propres correctifs d'isolation (aucune modif index.css requise)
+   ========================================================= */
+
+/* ---------- Wrapper racine : isolation du contexte ---------- */
+.eb-page {
+  /* Correctif : empêche tout ancêtre flex/centré de rogner le contenu */
+  width: 100%;
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 32px 24px 48px;
+
+  /* Correctif : compense une navbar en position fixed.
+     Si ta navbar est sticky, mets 32px. Si elle est fixed, mets ~96px. */
+  padding-top: 96px;
+
+  /* Correctif : garantit que rien n'est coupé par un parent overflow:hidden */
+  overflow: visible;
+  box-sizing: border-box;
+
+  color: #1e293b;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+/* ---------- En-tête ---------- */
+.eb-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 24px;
+  flex-wrap: wrap;
+  padding-bottom: 24px;
+  border-bottom: 1px solid #e2e8f0;
+  margin-bottom: 24px;
+}
+
+.eb-header-left {
+  min-width: 0;
+  flex: 1;
+}
+
+.eb-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: #64748b;
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+
+.eb-back:hover {
+  color: #2563eb;
+}
+
+.eb-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: #1e293b;
+  margin: 8px 0 4px;
+  line-height: 1.25;
+}
+
+.eb-title-club {
+  color: #2563eb;
+}
+
+.eb-subtitle {
+  font-size: 0.85rem;
+  color: #64748b;
+  margin: 0;
+}
+
+.eb-subtitle strong {
+  font-weight: 600;
+  color: #334155;
+}
+
+/* ---------- Alertes ---------- */
+.eb-alert {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  margin-bottom: 20px;
+  border: 1px solid transparent;
+  animation: eb-fade-slide 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.eb-alert--error {
+  background: #fef2f2;
+  color: #b91c1c;
+  border-color: #fecaca;
+}
+
+/* ---------- Carte conteneur ---------- */
+.eb-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  overflow: hidden;
+  animation: eb-fade-slide 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.eb-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 16px 20px;
+  border-bottom: 1px solid #e2e8f0;
+  background: #ffffff;
+}
+
+.eb-card-title {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #64748b;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.eb-card-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 22px;
+  height: 22px;
+  padding: 0 8px;
+  border-radius: 999px;
+  background: #eff6ff;
+  color: #2563eb;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0;
+}
+
+/* ---------- Tableau ---------- */
+.eb-table-wrapper {
+  overflow-x: auto;
+  width: 100%;
+}
+
+.eb-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+}
+
+.eb-table thead th {
+  text-align: left;
+  padding: 12px 20px;
+  color: #64748b;
+  font-weight: 600;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  border-bottom: 1px solid #e2e8f0;
+  background: #f8fafc;
+  white-space: nowrap;
+}
+
+.eb-table thead th.eb-th-center {
+  text-align: center;
+}
+
+.eb-table thead th.eb-th-right {
+  text-align: right;
+}
+
+.eb-table tbody td {
+  padding: 14px 20px;
+  border-bottom: 1px solid #f1f5f9;
+  color: #334155;
+  vertical-align: middle;
+}
+
+.eb-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.eb-table tbody tr {
+  transition: background 0.15s ease;
+}
+
+.eb-table tbody tr:hover {
+  background: #f8fafc;
+}
+
+/* ---------- Cellule "membre" ---------- */
+.eb-membre-cell {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.eb-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #eff6ff;
+  color: #2563eb;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 0.75rem;
+  flex-shrink: 0;
+}
+
+.eb-membre-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.eb-membre-nom {
+  font-weight: 600;
+  color: #1e293b;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.eb-membre-tag {
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: #2563eb;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.eb-date {
+  color: #64748b;
+  font-size: 0.82rem;
+  white-space: nowrap;
+}
+
+/* ---------- Badges rôle ---------- */
+.eb-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  line-height: 1.4;
+  white-space: nowrap;
+}
+
+.eb-badge--createur {
+  background: #eff6ff;
+  color: #2563eb;
+}
+
+.eb-badge--bureau {
+  background: #f5f3ff;
+  color: #7c3aed;
+}
+
+.eb-badge--membre {
+  background: #ecfdf5;
+  color: #059669;
+}
+
+/* ---------- Actions ---------- */
+.eb-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.eb-locked {
+  font-size: 0.75rem;
+  font-style: italic;
+  color: #94a3b8;
+}
+
+/* ---------- Boutons ---------- */
+.eb-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 7px 12px;
+  border-radius: 8px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+  font-family: inherit;
+  white-space: nowrap;
+  text-decoration: none;
+}
+
+.eb-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.eb-btn--primary {
+  background: #2563eb;
+  color: #ffffff;
+}
+.eb-btn--primary:hover:not(:disabled) {
+  background: #1d4ed8;
+}
+
+.eb-btn--ghost {
+  background: #ffffff;
+  color: #334155;
+  border-color: #e2e8f0;
+}
+.eb-btn--ghost:hover:not(:disabled) {
+  background: #f8fafc;
+  border-color: #cbd5e1;
+}
+
+.eb-btn--bureau {
+  background: #ffffff;
+  color: #7c3aed;
+  border-color: #ddd6fe;
+}
+.eb-btn--bureau:hover:not(:disabled) {
+  background: #f5f3ff;
+  border-color: #c4b5fd;
+}
+
+.eb-btn--danger {
+  background: #ffffff;
+  color: #ef4444;
+  border-color: #fecaca;
+}
+.eb-btn--danger:hover:not(:disabled) {
+  background: #fef2f2;
+  border-color: #fca5a5;
+}
+
+/* ---------- États ---------- */
+.eb-empty {
+  padding: 40px 24px;
+  text-align: center;
+  color: #94a3b8;
+  font-size: 0.85rem;
+}
+
+.eb-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 48px 0;
+  color: #64748b;
+  font-size: 0.85rem;
+}
+
+.eb-spinner {
+  width: 18px;
+  height: 18px;
+  border: 2px solid #e2e8f0;
+  border-top-color: #2563eb;
+  border-radius: 50%;
+  animation: eb-spin 0.7s linear infinite;
+}
+
+@keyframes eb-spin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes eb-fade-slide {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 640px) {
+  .eb-page {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+
+  .eb-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .eb-header .eb-btn--primary {
+    align-self: flex-start;
+  }
+
+  .eb-table thead th,
+  .eb-table tbody td {
+    padding-left: 14px;
+    padding-right: 14px;
+  }
+}

@@ -1,0 +1,315 @@
+/* =========================================================
+   MesClubs — aligné sur le vibe global (Linear / Notion / Stripe)
+   Palette : slate + blue-600 · Arrondis 8/12/999 · Ombres quasi nulles
+   ========================================================= */
+
+.mc-page {
+  max-width: 880px;
+  margin: 0 auto;
+  padding: 32px 24px 48px;
+  color: #1e293b;
+}
+
+/* ---------- Header de page ---------- */
+.mc-header {
+  margin-bottom: 32px;
+}
+
+.mc-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: #1e293b;
+  margin: 0 0 4px;
+}
+
+.mc-subtitle {
+  font-size: 0.85rem;
+  color: #64748b;
+  margin: 0;
+}
+
+/* ---------- Alertes ---------- */
+.mc-alert {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  margin-bottom: 16px;
+  border: 1px solid transparent;
+  animation: mc-fade-slide 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.mc-alert--error {
+  background: #fef2f2;
+  color: #b91c1c;
+  border-color: #fecaca;
+}
+
+.mc-alert--success {
+  background: #ecfdf5;
+  color: #047857;
+  border-color: #a7f3d0;
+}
+
+/* ---------- Section ---------- */
+.mc-section {
+  margin-bottom: 40px;
+}
+
+.mc-section-title {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #64748b;
+  margin: 0 0 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.mc-section-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 22px;
+  height: 22px;
+  padding: 0 8px;
+  border-radius: 999px;
+  background: #eff6ff;
+  color: #2563eb;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0;
+}
+
+/* ---------- Grille de cartes ---------- */
+.mc-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 16px;
+}
+
+/* ---------- Carte ---------- */
+.mc-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+  animation: mc-fade-slide 0.3s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.mc-card:hover {
+  border-color: #cbd5e1;
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.04);
+}
+
+/* Carte cliquable / "à rejoindre" */
+.mc-card--joinable:hover {
+  border-color: #bfdbfe;
+}
+
+/* ---------- En-tête de carte ---------- */
+.mc-card-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.mc-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #eff6ff;
+  color: #2563eb;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 0.85rem;
+  flex-shrink: 0;
+}
+
+.mc-card-head-text {
+  min-width: 0;
+  flex: 1;
+}
+
+.mc-card-name {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #1e293b;
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.mc-card-desc {
+  font-size: 0.8rem;
+  color: #64748b;
+  margin: 4px 0 0;
+  line-height: 1.45;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* ---------- Badges ---------- */
+.mc-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  line-height: 1.4;
+  white-space: nowrap;
+}
+
+.mc-badge--responsable {
+  background: #eff6ff;
+  color: #2563eb;
+}
+
+.mc-badge--bureau {
+  background: #f5f3ff;
+  color: #7c3aed;
+}
+
+.mc-badge--membre {
+  background: #ecfdf5;
+  color: #059669;
+}
+
+/* ---------- Footer de carte (actions) ---------- */
+.mc-card-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: auto;
+  padding-top: 8px;
+  border-top: 1px solid #f1f5f9;
+}
+
+/* ---------- Boutons ---------- */
+.mc-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border-radius: 8px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+  font-family: inherit;
+  white-space: nowrap;
+}
+
+.mc-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Primaire (bleu plein) */
+.mc-btn--primary {
+  background: #2563eb;
+  color: #ffffff;
+}
+.mc-btn--primary:hover:not(:disabled) {
+  background: #1d4ed8;
+}
+
+/* Ghost (blanc bordé) */
+.mc-btn--ghost {
+  background: #ffffff;
+  color: #334155;
+  border-color: #e2e8f0;
+}
+.mc-btn--ghost:hover:not(:disabled) {
+  background: #f8fafc;
+  border-color: #cbd5e1;
+}
+
+/* Danger (rouge) */
+.mc-btn--danger {
+  background: #ffffff;
+  color: #ef4444;
+  border-color: #fecaca;
+}
+.mc-btn--danger:hover:not(:disabled) {
+  background: #fef2f2;
+  border-color: #fca5a5;
+}
+
+/* Bureau (violet doux — couleur secondaire cohérente avec le badge) */
+.mc-btn--bureau {
+  background: #ffffff;
+  color: #7c3aed;
+  border-color: #ddd6fe;
+}
+.mc-btn--bureau:hover:not(:disabled) {
+  background: #f5f3ff;
+  border-color: #c4b5fd;
+}
+
+/* ---------- État vide ---------- */
+.mc-empty {
+  background: #f8fafc;
+  border: 1px dashed #e2e8f0;
+  border-radius: 12px;
+  padding: 32px 24px;
+  text-align: center;
+  color: #94a3b8;
+  font-size: 0.85rem;
+}
+
+/* ---------- Spinner ---------- */
+.mc-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 32px 0;
+  color: #64748b;
+  font-size: 0.85rem;
+}
+
+.mc-spinner {
+  width: 18px;
+  height: 18px;
+  border: 2px solid #e2e8f0;
+  border-top-color: #2563eb;
+  border-radius: 50%;
+  animation: mc-spin 0.7s linear infinite;
+}
+
+@keyframes mc-spin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes mc-fade-slide {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

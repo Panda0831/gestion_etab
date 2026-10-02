@@ -1,0 +1,263 @@
+/* =========================================================
+   Clubs — wrapper de page (header + formulaire + MesClubs)
+   Aligné sur le vibe global · Palette slate + blue-600
+   Contient son propre correctif navbar (aucune modif index.css requise)
+   ========================================================= */
+
+.clubs-page {
+  width: 100%;
+  max-width: 880px;              /* même largeur que .mc-page */
+  margin: 0 auto;
+  padding: 32px 24px 48px;
+
+  /* Correctif : compense une navbar fixed (ajuste si besoin) */
+  padding-top: 96px;
+
+  overflow: visible;
+  box-sizing: border-box;
+  color: #1e293b;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+/* Quand on délègue à MesClubs, on enlève le padding horizontal
+   pour ne pas doubler avec .mc-page (qui a déjà son propre padding) */
+.clubs-page--embed-mesclubs {
+  padding-left: 0;
+  padding-right: 0;
+}
+
+/* ---------- En-tête ---------- */
+.clubs-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #e2e8f0;
+  margin-bottom: 24px;
+}
+
+.clubs-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: #1e293b;
+  margin: 0;
+  line-height: 1.25;
+}
+
+.clubs-subtitle {
+  font-size: 0.85rem;
+  color: #64748b;
+  margin: 4px 0 0;
+}
+
+/* ---------- Alertes ---------- */
+.clubs-alert {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  margin-bottom: 20px;
+  border: 1px solid transparent;
+  animation: clubs-fade-slide 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.clubs-alert--success {
+  background: #ecfdf5;
+  color: #047857;
+  border-color: #a7f3d0;
+}
+
+.clubs-alert--error {
+  background: #fef2f2;
+  color: #b91c1c;
+  border-color: #fecaca;
+}
+
+/* ---------- Écran "connexion requise" ---------- */
+.clubs-auth-required {
+  width: 100%;
+  max-width: 480px;
+  margin: 0 auto;
+  padding: 48px 24px;
+  padding-top: 128px;
+  text-align: center;
+  color: #64748b;
+  font-size: 0.9rem;
+}
+
+.clubs-auth-required-icon {
+  width: 48px;
+  height: 48px;
+  margin: 0 auto 16px;
+  border-radius: 50%;
+  background: #eff6ff;
+  color: #2563eb;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+}
+
+.clubs-auth-required-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #1e293b;
+  margin: 0 0 4px;
+}
+
+/* ---------- Formulaire animé ---------- */
+.clubs-form {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  overflow: hidden;
+}
+
+.clubs-form-title {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #64748b;
+  margin: 0;
+}
+
+.clubs-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.clubs-label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #64748b;
+}
+
+.clubs-input,
+.clubs-textarea {
+  width: 100%;
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+  background: #ffffff;
+  font-size: 0.875rem;
+  font-family: inherit;
+  color: #1e293b;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  box-sizing: border-box;
+}
+
+.clubs-input::placeholder,
+.clubs-textarea::placeholder {
+  color: #94a3b8;
+}
+
+.clubs-input:focus,
+.clubs-textarea:focus {
+  outline: none;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+}
+
+.clubs-textarea {
+  resize: vertical;
+  min-height: 76px;
+  line-height: 1.5;
+}
+
+/* ---------- Boutons ---------- */
+.clubs-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border-radius: 8px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+  font-family: inherit;
+  white-space: nowrap;
+  text-decoration: none;
+}
+
+.clubs-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.clubs-btn--primary {
+  background: #2563eb;
+  color: #ffffff;
+}
+.clubs-btn--primary:hover:not(:disabled) {
+  background: #1d4ed8;
+}
+
+.clubs-btn--success {
+  background: #10b981;
+  color: #ffffff;
+}
+.clubs-btn--success:hover:not(:disabled) {
+  background: #059669;
+}
+
+.clubs-btn--ghost {
+  background: #ffffff;
+  color: #334155;
+  border-color: #e2e8f0;
+}
+.clubs-btn--ghost:hover:not(:disabled) {
+  background: #f8fafc;
+  border-color: #cbd5e1;
+}
+
+/* ---------- Zone "Mes clubs" embarquée ---------- */
+.clubs-embedded {
+  /* Petit séparateur discret au-dessus de la zone MesClubs */
+  padding-top: 8px;
+  border-top: 1px solid #e2e8f0;
+}
+
+/* ---------- Animations ---------- */
+@keyframes clubs-fade-slide {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 640px) {
+  .clubs-page {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+
+  .clubs-header {
+    align-items: stretch;
+  }
+
+  .clubs-header .clubs-btn--primary {
+    align-self: flex-start;
+  }
+}
