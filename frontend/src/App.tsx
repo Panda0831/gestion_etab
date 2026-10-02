@@ -15,6 +15,7 @@ import { User } from "./types/auth";
 import "./App.css";
 import ListeEleves from "./pages/ListEleve";
 import EspaceBureau from "./pages/clubs/EspaceBureau";
+import DemandesActivites from "./pages/clubs/DemandesActivites";
 
 
 const API_URL = "http://localhost:3000";
@@ -118,6 +119,7 @@ function AnimatedRoutes({
         />
 
         <Route path="/club/bureau/:id" element={<EspaceBureau />} />
+        <Route path="/club/:id/activites" element={<DemandesActivites />} />
       </Routes>
     </AnimatePresence>
   );

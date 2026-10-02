@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { get, patch, del } from "../../services/api"; // Import de 'del'
 
+
 interface Membre {
   id: string; 
   role: "MEMBRE" | "BUREAU";
@@ -105,6 +106,29 @@ export default function EspaceBureau() {
     <div className="p-6 max-w-4xl mx-auto space-y-6">
       
       {/* En-tête */}
+        <div className="flex justify-between items-center border-b pb-4">
+        <div>
+            <Link to="/club" className="text-sm text-blue-600 hover:underline">
+            &larr; Retour à mes clubs
+            </Link>
+            <h1 className="text-3xl font-extrabold text-gray-900 mt-2">
+            Espace Bureau - {club.nom}
+            </h1>
+            <p className="text-gray-500 text-sm mt-1">
+            Créateur & Responsable :{" "}
+            <span className="font-semibold text-blue-600">
+                {club.responsable.prenom} {club.responsable.nom}
+            </span>
+            </p>
+        </div>
+
+        <Link
+            to={`/club/${club.id}/activites`}
+            className="px-4 py-2 rounded-lg bg-blue-600 text-white text-sm font-semibold shadow-sm hover:bg-blue-700 transition"
+        >
+            Gérer les activités
+        </Link>
+        </div>
       <div className="flex justify-between items-center border-b pb-4">
         <div>
           <Link to="/club" className="text-sm text-blue-600 hover:underline">

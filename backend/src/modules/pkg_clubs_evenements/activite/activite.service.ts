@@ -7,9 +7,15 @@ import { UpdateActiviteDto } from './dto/update-activite.dto';
 export class ActiviteService {
   constructor(private readonly prisma: PrismaService) {}
 
-  create(createActiviteDto: CreateActiviteDto) {
+  create(dto: CreateActiviteDto) {
     return this.prisma.activite.create({
-      data: createActiviteDto as any,
+      data: {
+        clubEvenementId: dto.clubEvenementId,
+        titre: dto.titre,
+        description: dto.description,
+        dateActivite: new Date(dto.dateActivite),
+        lieu: dto.lieu,
+      },
     });
   }
 
